@@ -12,5 +12,5 @@ function [time,RMSE] = evaluate(fun,par,x,y)
     
     time = toc(tStart);    %Return time
     
-    RMSE = sqrt(immse(y,y_hat));    %Calculate RMSE    
+    RMSE = sqrt((norm(y(:)-y_hat(:),2).^2)/numel(y));    %Calculate RMSE    
 end
