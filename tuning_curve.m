@@ -1,4 +1,4 @@
-function peak = tuning_curve(data,unit,dt,opt)
+function peak = tuning_curve(data,unit,dt,opt,show)
     % peak = TUNING_CURVE(data,unit,dt,opt)
     % data - given struct array 
     % unit - scalar determining unit
@@ -6,6 +6,8 @@ function peak = tuning_curve(data,unit,dt,opt)
     % opt - string argument: 
         % 'count' - fire rate as spike count
         % 'density' - fire rate as spike density
+    % show - string argument: 
+        % 'show' - plots graph
     % peak = scalar determining preferred angle
         
     [T,A] = size(data);
@@ -43,12 +45,14 @@ function peak = tuning_curve(data,unit,dt,opt)
     
     [~,peak] = max(fr);
     
-    figure;
-    errorbar(angle_list,fr,fr_std,'-s','LineWidth',2,'Color','k','MarkerSize',10,...
-    'MarkerEdgeColor','red','MarkerFaceColor','red');
-    set(gca,'FontSize',15);
-    xlabel('Angle [rad]','FontSize',20);
-    ylabel('Firing rate [spikes/s]','FontSize',20);
+    if strcmpi(show,'show')
+        figure;
+        errorbar(angle_list,fr,fr_std,'-s','LineWidth',2,'Color','k','MarkerSize',10,...
+        'MarkerEdgeColor','red','MarkerFaceColor','red');
+        set(gca,'FontSize',15);
+        xlabel('Angle [rad]','FontSize',20);
+        ylabel('Firing rate [spikes/s]','FontSize',20);
+    end
 
     
 end
