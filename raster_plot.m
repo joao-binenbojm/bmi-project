@@ -1,4 +1,5 @@
 function [] = raster_plot(data,sel,opt,type)
+    % [] = RASTER_PLOT(data,sel,opt,type)
     % data - given struct array 
     % sel - struct with fields:
         %.trial - range or single trial value
