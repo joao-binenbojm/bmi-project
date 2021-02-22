@@ -1,0 +1,15 @@
+function corrmap(data,sel,unit,type)
+    % [] = RASTER_PLOT(data,sel,opt,type)
+    % data - given struct array 
+    % sel - struct with fields:
+        %.trial - range or single trial value
+        %.angle - range or single angle value
+        %.unit - range or single unit value
+    % unit - integerargument: 
+        % specifies which neural unit to compute the correlation map for
+    % type - string argument: 
+        % 'dot' - displays colour scatter plot
+        % 'trial' - displays monocromatic line plot
+        
+     
+end
