@@ -5,6 +5,7 @@ function data_out = extractfield(data,field)
             % 'spikes' - EEG data
             % 'handPos' - X-Y-Z position of hand
             % 'trialId' - trial ID
+        % data_out - extracted field as a matrix or tensor
             
     [T,A] = size(data);
             
