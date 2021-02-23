@@ -14,7 +14,7 @@ function [] = raster_plot(data,sel,opt,type)
         % for same unit and trial  
     % type - string argument: 
         % 'dot' - displays colour scatter plot
-        % 'trial' - displays monocromatic line plot
+        % 'line' - displays monocromatic line plot
         
     figure;
     hold on;
