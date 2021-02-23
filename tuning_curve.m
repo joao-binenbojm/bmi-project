@@ -1,5 +1,5 @@
 function peak = tuning_curve(data,unit,dt,opt,show)
-    % peak = TUNING_CURVE(data,unit,dt,opt)
+    % peak = TUNING_CURVE(data,unit,dt,opt,show)
     % data - given struct array 
     % unit - scalar determining unit
     % dt - scalar determining time interval in ms
