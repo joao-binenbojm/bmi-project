@@ -2,8 +2,8 @@ function [] = position_plot(data,sel,type)
     % [] = POSITION_PLOT(data,sel,type)
     % data - given struct array 
     % sel - struct with fields:
-        %.trial - range or single trial value
-        %.angle - range or single angle value    
+        %.trial - single trial value
+        %.angle - single angle value    
     % type - string argument: 
         % '2d' - displays X,Y dimensions
         % '3d' - displays X,Y,Z dimensions
