@@ -4,7 +4,8 @@ function [] = position_plot(data,sel,type)
     % sel - struct with fields:
         %.trial - range or single trial value
         %.angle - range or single angle value    
-    % type - string argument: 
+    % type - string argument:
+        % '1d' - displays X,Y dimensions across time
         % '2d' - displays X,Y dimensions
         % '3d' - displays X,Y,Z dimensions
     
@@ -12,8 +13,15 @@ function [] = position_plot(data,sel,type)
         for j = 1:1:length(sel.angle)
             plot_data = data(i,j).handPos;
             
-            if strcmpi(type,'2d')
-                figure;
+            if strcmpi(type,'1d')
+                hold on;
+                plot(1:1:length(plot_data(1,:)),plot_data(1,:),'LineWidth',2,'Color','b');
+                plot(1:1:length(plot_data(2,:)),plot_data(2,:),'LineWidth',2,'Color','g');
+                set(gca,'FontSize',15);
+                grid on;
+                xlabel('$t$ [ms]','FontSize',20);
+                ylabel('$x,y$ [mm]','FontSize',20); 
+            elseif strcmpi(type,'2d')
                 hold on;
                 plot(plot_data(1,:),plot_data(2,:),'LineWidth',2);
                 set(gca,'FontSize',15);
@@ -21,7 +29,6 @@ function [] = position_plot(data,sel,type)
                 xlabel('$x$ [mm]','FontSize',20);
                 ylabel('$y$ [mm]','FontSize',20); 
             elseif strcmpi(type,'3d')
-                figure;
                 hold on;
                 plot3(plot_data(1,:),plot_data(2,:),plot_data(3,:),'LineWidth',2);
                 set(gca,'FontSize',15);
@@ -30,7 +37,7 @@ function [] = position_plot(data,sel,type)
                 ylabel('$y$ [mm]','FontSize',20); 
                 zlabel('$z$ [mm]','FontSize',20); 
             else
-                error('Invalid selection: type must be *2d* or *3d*');
+                error('Invalid selection: type must be *1d*, *2d* or *3d*');
             end
         end
     end
