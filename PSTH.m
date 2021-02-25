@@ -1,4 +1,4 @@
-function out = PSTH(data,sel,period)
+function out = PSTH(data,sel,period,show)
     % out = PSTH(data,sel,period)
     % data - given struct array
     % sel - struct with fields:
@@ -6,6 +6,8 @@ function out = PSTH(data,sel,period)
         %.unit - single unit value
     % period - time interval, must be multiple
     % of the number of samples per trial
+    % show - string argument:
+        %'show' - displays PSTH
     %out - struct with fields:
         %.psth = spike counts per bin
         %.bins = bin array
@@ -26,7 +28,9 @@ function out = PSTH(data,sel,period)
         var(data(jj,sel.angle).spikes(sel.unit,:)==0) = NaN;
         psth = psth + histcounts([1:1:n].*var,edges)';
     end
-    bar(period:period:length(psth)*period,psth','b');
+    if strcmpi(show,'show')
+        bar(period:period:length(psth)*period,psth','b');
+    end
     set(gca,'FontSize',15);
     xlabel('Time [ms]','FontSize',20);
     ylabel('\# of spikes','FontSize',20);  
