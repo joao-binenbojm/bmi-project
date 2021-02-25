@@ -76,7 +76,6 @@ function peak = tuning_curve(data,unit,dt,opt,show)
     [~,peak] = max(fr);
     
     if strcmpi(show,'show')
-        figure;
         errorbar(angle_list,fr,fr_std,'-s','LineWidth',2,'Color','k','MarkerSize',10,...
         'MarkerEdgeColor','red','MarkerFaceColor','red');
         set(gca,'FontSize',15);
