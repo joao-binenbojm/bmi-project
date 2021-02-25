@@ -24,3 +24,7 @@ out = out(1:3,:,:);
 out = out/80;
 
 test = reshape(out,294,8);
+
+%% New features (by Ruben)
+
+
