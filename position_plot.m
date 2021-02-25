@@ -11,7 +11,7 @@ function [] = position_plot(data,sel,type)
     
     for i = 1:1:length(sel.trial)
         for j = 1:1:length(sel.angle)
-            plot_data = data(i,j).handPos;
+            plot_data = data(sel.trial(i),sel.angle(j)).handPos;
             
             if strcmpi(type,'1d')
                 hold on;
