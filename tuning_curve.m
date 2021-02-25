@@ -8,7 +8,9 @@ function peak = tuning_curve(data,unit,dt,opt,show)
         % 'density' - fire rate as spike density
     % show - string argument: 
         % 'show' - plots graph
-    % peak = scalar determining preferred angle
+    % peak = struct with fields
+        % .idx - indicates the preferred angle
+        % .values - stores the average firing rate over angles
         
     [T,A] = size(data);
     angle_list = [30/180*pi,70/180*pi,110/180*pi,150/180*pi,190/180*pi,230/180*pi,310/180*pi,350/180*pi];
@@ -73,7 +75,7 @@ function peak = tuning_curve(data,unit,dt,opt,show)
         
     end
     
-    [~,peak] = max(fr);
+    [~,peak.idx] = max(fr);
     
     if strcmpi(show,'show')
         errorbar(angle_list,fr,fr_std,'-s','LineWidth',2,'Color','k','MarkerSize',10,...
@@ -82,5 +84,7 @@ function peak = tuning_curve(data,unit,dt,opt,show)
         xlabel('Angle [rad]','FontSize',20);
         ylabel('Firing rate [spikes/s]','FontSize',20);
     end
+    
+    peak.values = fr;
 end
 
