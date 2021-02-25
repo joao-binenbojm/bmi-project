@@ -1,11 +1,14 @@
-function [] = PSTH(data,sel,period)
-    % [] = PSTH(data,sel,period)
+function out = PSTH(data,sel,period)
+    % out = PSTH(data,sel,period)
     % data - given struct array
     % sel - struct with fields:
         %.angle - single angle value
         %.unit - single unit value
     % period - time interval, must be multiple
     % of the number of samples per trial
+    %out - struct with fields:
+        %.psth = spike counts per bin
+        %.bins = bin array
         
     [T,~] = size(data);
     N_array = zeros(1,T);
@@ -26,5 +29,8 @@ function [] = PSTH(data,sel,period)
     bar(period:period:length(psth)*period,psth','b');
     set(gca,'FontSize',15);
     xlabel('Time [ms]','FontSize',20);
-    ylabel('\# of spikes','FontSize',20);    
+    ylabel('\# of spikes','FontSize',20);  
+    
+    out.psth = psth';
+    out.bins = period:period:length(psth)*period;
 end
