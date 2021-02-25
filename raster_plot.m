@@ -16,7 +16,6 @@ function [] = raster_plot(data,sel,opt,type)
         % 'dot' - displays colour scatter plot
         % 'line' - displays monocromatic line plot
         
-    figure;
     hold on;
     if strcmpi(opt,'trial')
        if length(sel.unit)~=1 || length(sel.angle)~=1  

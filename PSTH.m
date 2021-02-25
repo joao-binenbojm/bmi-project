@@ -23,7 +23,6 @@ function [] = PSTH(data,sel,period)
         var(data(jj,sel.angle).spikes(sel.unit,:)==0) = NaN;
         psth = psth + histcounts([1:1:n].*var,edges)';
     end
-    figure;
     bar(period:period:length(psth)*period,psth','b');
     set(gca,'FontSize',15);
     xlabel('Time [ms]','FontSize',20);
