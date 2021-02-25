@@ -8,7 +8,7 @@ function peak = tuning_curve(data,unit,dt,opt,show)
         % 'density' - fire rate as spike density
     % show - string argument: 
         % 'show' - plots graph
-    % peak = struct with fields
+    % peak - struct with fields
         % .idx - indicates the preferred angle
         % .values - stores the average firing rate over angles
         
