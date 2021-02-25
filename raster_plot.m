@@ -14,9 +14,8 @@ function [] = raster_plot(data,sel,opt,type)
         % for same unit and trial  
     % type - string argument: 
         % 'dot' - displays colour scatter plot
-        % 'trial' - displays monocromatic line plot
+        % 'line' - displays monocromatic line plot
         
-    figure;
     hold on;
     if strcmpi(opt,'trial')
        if length(sel.unit)~=1 || length(sel.angle)~=1  
@@ -34,12 +33,12 @@ function [] = raster_plot(data,sel,opt,type)
             xlabel('Time [ms]','FontSize',20);
             ylabel('Trials','FontSize',20);
         elseif strcmpi(type,'line')
-            t = zeros(1,800,length(sel.trial));
+            t = zeros(1,1000,length(sel.trial));
             for i = 1:1:length(sel.trial)
-                t(:,:,i) = [data(sel.trial(i),sel.angle).spikes(sel.unit,:),zeros(1,800-length(data(sel.trial(i),sel.angle).spikes(sel.unit,:)))];
+                t(:,:,i) = [data(sel.trial(i),sel.angle).spikes(sel.unit,:),zeros(1,1000-length(data(sel.trial(i),sel.angle).spikes(sel.unit,:)))];
             end
-            plot_data = transpose(repmat(1:1:800,length(sel.trial),1)).*squeeze(t);
-            for i = 1:1:800
+            plot_data = transpose(repmat(1:1:1000,length(sel.trial),1)).*squeeze(t);
+            for i = 1:1:1000
                 for ii = 1:1:length(sel.trial)
                 line([plot_data(i,ii),plot_data(i,ii)],[sel.trial(ii)-1,sel.trial(ii)],'Color','b')
                 end
@@ -66,12 +65,12 @@ function [] = raster_plot(data,sel,opt,type)
             xlabel('Time [ms]','FontSize',20);
             ylabel('Units','FontSize',20);
         elseif strcmpi(type,'line')
-            t = zeros(1,800,length(sel.unit));
+            t = zeros(1,1000,length(sel.unit));
             for i = 1:1:length(sel.unit)
-                t(:,:,i) = [data(sel.trial,sel.angle).spikes(sel.unit(i),:),zeros(1,800-length(data(sel.trial,sel.angle).spikes(sel.unit(i),:)))];
+                t(:,:,i) = [data(sel.trial,sel.angle).spikes(sel.unit(i),:),zeros(1,1000-length(data(sel.trial,sel.angle).spikes(sel.unit(i),:)))];
             end
-            plot_data = transpose(repmat(1:1:800,length(sel.unit),1)).*squeeze(t);
-            for i = 1:1:800
+            plot_data = transpose(repmat(1:1:1000,length(sel.unit),1)).*squeeze(t);
+            for i = 1:1:1000
                 for ii = 1:1:length(sel.unit)
                 line([plot_data(i,ii),plot_data(i,ii)],[sel.unit(ii)-1,sel.unit(ii)],'Color','b')
                 end
@@ -98,12 +97,12 @@ function [] = raster_plot(data,sel,opt,type)
             xlabel('Time [ms]','FontSize',20);
             ylabel('Units','FontSize',20);
         elseif strcmpi(type,'line')
-            t = zeros(1,800,length(sel.angle));
+            t = zeros(1,1000,length(sel.angle));
             for i = 1:1:length(sel.angle)
-                t(:,:,i) = [data(sel.trial,sel.angle(i)).spikes(sel.unit,:),zeros(1,800-length(data(sel.trial,sel.angle(i)).spikes(sel.unit,:)))];
+                t(:,:,i) = [data(sel.trial,sel.angle(i)).spikes(sel.unit,:),zeros(1,1000-length(data(sel.trial,sel.angle(i)).spikes(sel.unit,:)))];
             end
-            plot_data = transpose(repmat(1:1:800,length(sel.angle),1)).*squeeze(t);
-            for i = 1:1:800
+            plot_data = transpose(repmat(1:1:1000,length(sel.angle),1)).*squeeze(t);
+            for i = 1:1:1000
                 for ii = 1:1:length(sel.angle)
                 line([plot_data(i,ii),plot_data(i,ii)],[sel.angle(ii)-1,sel.angle(ii)],'Color','b')
                 end
