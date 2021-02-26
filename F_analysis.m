@@ -5,7 +5,8 @@ function F_data = F_analysis(trial,opt)
             % detrend - fft of detrended data
             % [] - fft of raw data
         % F_data - Fourier transform of data
-        
+    
+    data = section(trial);   
     data = extractfield(trial,'spikes');
 
     [T,A,U,~] = size(data);
