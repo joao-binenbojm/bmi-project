@@ -14,9 +14,9 @@ function F_data = F_analysis(trial,opt)
     F_data = NaN(T,A,U,1000);
     for i = 1:1:T
         for j = 1:1:A
+            var = data(1,:,i,j);
             nonan_len = length(var(~isnan(var)));
             for k = 1:1:U
-                var = data(k,:,i,j);
                 if strcmp(opt,'detrend')
                     x = detrend(squeeze(data(k,1:1:nonan_len,i,j)));
                 end
