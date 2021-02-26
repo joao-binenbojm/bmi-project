@@ -7,18 +7,18 @@ function F_data = F_analysis(trial,opt)
         % F_data - Fourier transform of data
     
     data = section(trial);   
-    data = extractfield(trial,'spikes');
+    data = extractfield(data,'spikes');
 
-    [T,A,U,~] = size(data);
+    [U,~,T,A] = size(data);
 
     F_data = NaN(T,A,U,1000);
     for i = 1:1:T
         for j = 1:1:A
+            nonan_len = length(var(~isnan(var)));
             for k = 1:1:U
-                var = data(i,j,k,:);
-                nonan_len = length(var(~isnan(var)));
+                var = data(k,:,i,j);
                 if strcmp(opt,'detrend')
-                    x = detrend(squeeze(data(i,j,k,1:1:nonan_len)));
+                    x = detrend(squeeze(data(k,1:1:nonan_len,i,j)));
                 end
                 F_data(i,j,k,1:nonan_len) = abs(fftshift(fft(squeeze(x))));
             end
