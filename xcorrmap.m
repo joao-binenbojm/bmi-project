@@ -1,11 +1,10 @@
-function map = xcorrmap(data,sel,show)
-    % [] = CORRMAP(data,sel,show)
+function [map, mean_spikes] = xcorrmap(data,sel,show)
+    % [map, mean_spikes] = XCORRMAP(data,sel,show)
     % data - given struct array 
     % sel - struct with fields:
         %.trial - range or single trial value
         %.angle - single angle value
         %.unit - single unit value
-        %.range - range of cross-correlation lags
         %.fs - sampling frequency
     % show - boolean argument: 
         % true - computes cross-correlation heatmap between neuronal unit
@@ -37,15 +36,13 @@ function map = xcorrmap(data,sel,show)
      for i = 1:98
          map = [map; xcorr(mean_spikes(sel.unit, :), mean_spikes(i, :))];
      end
-     % Only keep/display selected range
-     cent_data = length(mean_spikes) + sel.range;
-     map = map(:, floor(min(cent_data)):floor(max(cent_data)));
+     
      % If selected, display correlation heatmap
      if show
          imagesc(map, [min(map,[],'all'), max(map,[],'all')]);
          xticklabels({(xticks - length(mean_spikes))/sel.fs})
          xlabel('Time lags (s)'); ylabel('Neural Unit Number');
-         title(sprintf('Cross-correlation of Unit %d with other Units (angle %d, trials %d-%d)', ...
+         title(sprintf('Unit %d with other Units (angle %d, trials %d-%d)', ...
              sel.unit, sel.angle, sel.trial(1), sel.trial(end) ));
          colormap('hot');
          colorbar;
