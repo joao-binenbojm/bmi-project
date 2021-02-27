@@ -1,4 +1,4 @@
-function out = PSTH(data,sel,period,show)
+ function out = PSTH(data,sel,period,show)
     % out = PSTH(data,sel,period)
     % data - given struct array
     % sel - struct with fields:

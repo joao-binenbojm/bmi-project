@@ -1,4 +1,4 @@
-function peak = tuning_curve(data,unit,dt,opt,show)
+ function peak = tuning_curve(data,unit,dt,opt,show)
     % peak = TUNING_CURVE(data,unit,dt,opt,show)
     % data - given struct array 
     % unit - scalar determining unit

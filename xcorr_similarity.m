@@ -1,5 +1,5 @@
 function sim_mat = xcorr_similarity(data)
-% Computes cross-correlation dissimilarity for every neuron unit pair
+% sim_mat = XCORR_SIMILARITY(data) Computes cross-correlation dissimilarity for every neuron unit pair
    % sim_mat = xcorr_similarity(data,fs)
     % data - given struct array 
     % fs - time-series sampling frequency
