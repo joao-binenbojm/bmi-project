@@ -1,4 +1,16 @@
 %% PCA
+%data is fr_avg from Ruben found in matlab.mat downloads
+
+s = sum(fr_avg/1);
+peaks_norm = fr_avg./s;
+[coeff,score,latent,tsquared,explained,mu] = pca(peaks_norm,'NumComponents',3);
+
+gscatter(score(:,2),score(:,3),Y);
+xlabel('PCA 2');
+ylabel('PCA 3');
+
+%%
+
 
 load features.mat
 load labels_tuning_curve.mat
