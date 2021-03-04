@@ -7,9 +7,14 @@ clear variables; clc; close all;
 
 load('monkeydata_training');
 
-data = extractfield(trial,'handPos');
+Data = extractfield(trial,'handPos');
 
-data = data(1:2,1:672,1,1);
+Spikes = extractfield(trial,'spikes');
+
+%%
+
+split_spikes = squeeze(Spikes(1,1:672,:,1));
+data = Data(1:2,1:672,1,1);
 
 vel(1,:) = [0,diff(data(1,:),1)];
 vel(2,:) = [0,diff(data(2,:),1)];
@@ -33,18 +38,36 @@ subplot(3,1,3);
 plot(1:1:length(data),acc,'LineWidth',2)
 title('Acceleration','FontSize',20)
 
-X = cat(1,data,vel,acc,mag_pos,mag_vel);
-
-x = X(:,50);
-dt = 20;
+x = cat(1,data,vel,acc,mag_pos,mag_vel);
 
 % Initialising variables
-
+spikes = split_spikes(200:1:end-100,:);
+X = x(:,100:1:end);
 m = randi(8);
-delta = 10;
+delta = 50;
+clear frFit;
 
-for u = 1:1:98
-    lag{u} = 
+figure;
+sel.angle = 1;
+sel.unit = 1;
+h = PSTH(trial,sel,delta,'show');
+hold on
+
+% Neural encoding
+
+for lag = 0:1:200/delta
+    for t = 1:1:100
+        s = histcounts(spikes(:,t).*[1:1:length(spikes(:,t))]',1:delta:length(spikes(:,t)));
+        numBins = length(s);
+        kin = X(:,1:delta:length(X)-delta);
+        predictor = [ones(numBins,1),kin(1,lag+1:lag+numBins)',kin(2,lag+1:lag+numBins)',kin(3,lag+1:lag+numBins)',kin(4,lag+1:lag+numBins)',kin(5,lag+1:lag+numBins)',kin(6,lag+1:lag+numBins)',kin(7,lag+1:lag+numBins)',kin(8,lag+1:lag+numBins)'];
+        theta{t} = glmfit(predictor(:,2:end),s,'poisson');
+        frFit(:,t) = exp(predictor*theta{t});
+    end
+
+    fr_pred = sum(frFit,2);
+
+    bar(h.bins(200/delta+1:200/delta+length(fr_pred)),fr_pred);
 end
 
 for i = 1:1:8
