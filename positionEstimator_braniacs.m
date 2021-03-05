@@ -30,11 +30,7 @@ function [x, y, newModelParameters] = positionEstimator_braniacs(testData, model
     end
     
     pred_angle_list = modelParameters.pred_angle; 
-    [pred_angle,~,C] = mode(pred_angle_list); % majority voting
-    
-    if length(cell2mat(C))~=1 % rely more on last predicted angle (based on more data)
-        pred_angle = pred_angle_list(end);
-    end
+    [pred_angle,~,~] = mode(pred_angle_list); % majority voting
     
     % PCR regressor testing
     
