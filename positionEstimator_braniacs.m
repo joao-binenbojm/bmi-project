@@ -20,17 +20,11 @@ function [x, y, newModelParameters] = positionEstimator_braniacs(testData, model
     if N==320 || N==400 || N==480 || N==560
         C_param = modelParameters.C_param; % extract LDA classification parameters
         [~,fr_avg] = fr_features(testData,80,N); % preprocess EEG data
-        if N==320 % clear list for next trial
-            modelParameters.pred_angle = [];
-        end
-        pred_angle = predict(C_param.Mdl_LDA,fr_avg); % classify angle from LDA
-        prev_pred_angle = modelParameters.pred_angle; % append new pred_angle to parameters
-        modelParameters.pred_angle = [prev_pred_angle pred_angle];
-            
+        pred_angle = predict(C_param.Mdl_LDA,fr_avg); % classify angle from LDA 
+        modelParameters.pred_angle = pred_angle;
+    else
+        pred_angle = modelParameters.pred_angle;
     end
-    
-    pred_angle_list = modelParameters.pred_angle; 
-    [pred_angle,~,~] = mode(pred_angle_list); % majority voting
     
     % PCR regressor testing
     
