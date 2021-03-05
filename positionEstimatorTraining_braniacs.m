@@ -17,8 +17,6 @@ function  [modelParameters] = positionEstimatorTraining_braniacs(trainingData)
     
     Y=repmat([1:1:8]',T,1); % generate labels for classifier 
     C_param.Mdl_LDA = fitcdiscr(fr_avg,Y); % LDA classifier object
-    C_param.Mdl_tree = fitctree(fr_avg,Y,'AlgorithmForCategorical','Exact'); % Tree classifier object
-    C_param.Mdl_knn = fitcknn(fr_avg,Y); % KNN classifier object
     
     % PCR regressor training
     

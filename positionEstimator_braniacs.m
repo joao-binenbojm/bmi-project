@@ -23,19 +23,18 @@ function [x, y, newModelParameters] = positionEstimator_braniacs(testData, model
         if N==320 % clear list for next trial
             modelParameters.pred_angle = [];
         end
-        pred_angle(1,1) = predict(C_param.Mdl_LDA,fr_avg); % classify angle from LDA
-        pred_angle(2,1) = predict(C_param.Mdl_knn,fr_avg); % classify angle from KNN
-        pred_angle(3,1) = predict(C_param.Mdl_tree,fr_avg); % classify angle from tree
+        pred_angle = predict(C_param.Mdl_LDA,fr_avg); % classify angle from LDA
         prev_pred_angle = modelParameters.pred_angle; % append new pred_angle to parameters
         modelParameters.pred_angle = [prev_pred_angle pred_angle];
             
     end
     
     pred_angle_list = modelParameters.pred_angle; 
-    [pred_angle,~,~] = mode(pred_angle_list(:,end)); % majority voting
+    [pred_angle,~,C] = mode(pred_angle_list); % majority voting
     
-%     if length(cell2mat(C))~=1 % rely more on LDA method 
-%     end
+    if length(cell2mat(C))~=1 % rely more on last predicted angle (based on more data)
+        pred_angle = pred_angle_list(end);
+    end
     
     % PCR regressor testing
     

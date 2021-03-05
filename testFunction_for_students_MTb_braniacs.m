@@ -46,10 +46,10 @@ for tr=1:size(testData,1)
 
             past_current_trial.startHandPos = testData(tr,direc).handPos(1:2,1); 
             
-            if nargout('positionEstimator') == 3
+            if nargout('positionEstimator_braniacs') == 3
                 [decodedPosX, decodedPosY, newParameters] = positionEstimator_braniacs(past_current_trial, modelParameters);
                 modelParameters = newParameters;
-            elseif nargout('positionEstimator') == 2
+            elseif nargout('positionEstimator_braniacs') == 2
                 [decodedPosX, decodedPosY] = positionEstimator_braniacs(past_current_trial, modelParameters);
             end
             
