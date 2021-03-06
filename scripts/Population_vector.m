@@ -4,6 +4,8 @@ set(groot, 'defaultTextInterpreter','latex');
 set(groot, 'defaultLegendInterpreter','latex');
 clc; clear variables; close all;
 
+addpath('funcs','data');
+
 load('monkeydata_training.mat');
 
 %Obtain preferred angles based on PSTH

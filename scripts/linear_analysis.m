@@ -1,7 +1,11 @@
 %% Determining linearities and collinearities, 
 % as well as possible transformations that might make the data a better fit
 clc; clear variables; close all;
+
+addpath('funcs','data');
+
 load monkeydata0;
+
 % Visualizing and understanding correlations between firing rate in
 % previous 20 samples and displacement (all angles)
 
