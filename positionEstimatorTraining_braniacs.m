@@ -47,17 +47,21 @@ function  [modelParameters] = positionEstimatorTraining_braniacs(trainingData)
             R_param(a,bin).y_avg_sampled = y_avg(a,range(bin));
             R_param(a,bin).x_std_sampled = x_std(a,range(bin)); % store standard deviation of positions at relevant locations
             R_param(a,bin).y_std_sampled = y_std(a,range(bin));
-            R_param(a,bin).x_vel_sampled = squeeze(mean(x_vel(a,range(bin)),1)); % store mean velocity at relevant locations
-            R_param(a,bin).y_vel_sampled = squeeze(mean(y_vel(a,range(bin)),1));
-            R_param(a,bin).x_acc_sampled = squeeze(mean(x_acc(a,range(bin)),1)); % store mean acceleration at relevant locations
-            R_param(a,bin).y_acc_sampled = squeeze(mean(y_acc(a,range(bin)),1));
+            R_param(a,bin).x_vel_sampled = squeeze(mean(x_vel(:,a,range(bin)),1)); % store mean velocity at relevant locations
+            R_param(a,bin).y_vel_sampled = squeeze(mean(y_vel(:,a,range(bin)),1));
+            R_param(a,bin).x_acc_sampled = squeeze(mean(x_acc(:,a,range(bin)),1)); % store mean acceleration at relevant locations
+            R_param(a,bin).y_acc_sampled = squeeze(mean(y_acc(:,a,range(bin)),1));
     
             idx_angle = (a-1)*T+1; % angle range index (for each a)
             bin_idx = (range(bin)/dt); % bin range index (for each bin)
             fr_bin = fr_total(idx_angle:idx_angle+T-1,1:98*bin_idx);
             bin_x = squeeze(x_detrended_sampled(:,a,bin));
             bin_y = squeeze(y_detrended_sampled(:,a,bin));
-            kin = [bin_x bin_y];
+            bin_x_vel = squeeze(x_vel(:,a,bin)-squeeze(mean(x_vel(:,a,range(bin)),1))); % add detrended velocity
+            bin_y_vel = squeeze(y_vel(:,a,bin)-squeeze(mean(y_vel(:,a,range(bin)),1)));
+            bin_x_acc = squeeze(x_acc(:,a,bin)-squeeze(mean(x_acc(:,a,range(bin)),1))); % add detrended acceleration
+            bin_y_acc = squeeze(y_acc(:,a,bin)-squeeze(mean(y_acc(:,a,range(bin)),1)));
+            kin = [bin_x bin_y bin_x_vel bin_y_vel bin_x_acc bin_y_acc];
             
             fr_bin_avg = mean(fr_bin,1);
             
