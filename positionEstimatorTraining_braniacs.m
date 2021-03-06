@@ -64,12 +64,12 @@ function  [modelParameters] = positionEstimatorTraining_braniacs(trainingData)
             kin = [bin_x bin_y bin_x_vel bin_y_vel bin_x_acc bin_y_acc];
             
             fr_bin_avg = mean(fr_bin,1);
+            R_param(a,bin).fr_bin_avg=fr_bin_avg; % store trial average firing rate per bin
             
             % Use PCA to extract principle components
             p = T-1;
             P = PCA(fr_bin,fr_bin_avg,p);
             W = P'*(fr_bin'-fr_bin_avg');
-            R_param(a,bin).fr_bin_avg=fr_bin_avg;
             update=P*(W*W')^(-1)*W*kin; % calculate linear regression
             R_param(a,bin).update = update;
         end
