@@ -45,11 +45,11 @@ function [x, y, newModelParameters] = positionEstimator_braniacs(testData, model
     x_std_sampled = param(pred_angle,idx_bin).x_std_sampled;
     y_std_sampled = param(pred_angle,idx_bin).y_std_sampled;
     
-    x_mean_pos = x_std_sampled*randn(1)+x_avg_sampled;
-    y_mean_pos = y_std_sampled*randn(1)+y_avg_sampled;
+    x = (fr_total-fr_bin_avg)*update_x+x_avg_sampled;
+    y = (fr_total-fr_bin_avg)*update_y+y_avg_sampled;
     
-    x = (fr_total-fr_bin_avg)*update_x+x_mean_pos;
-    y = (fr_total-fr_bin_avg)*update_y+y_mean_pos;
+    x = (x_std_sampled/10)*randn(1)+x;
+    y = (y_std_sampled/10)*randn(1)+y;
     
     newModelParameters = modelParameters;
 end
