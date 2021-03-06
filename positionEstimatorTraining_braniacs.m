@@ -24,11 +24,11 @@ function  [modelParameters] = positionEstimatorTraining_braniacs(trainingData)
     range = 320:dt:N; % define relevant time steps
     
     [fr_total,~] = fr_features(trainingData,20,N);
-    [x,y,x_avg,y_avg,~,~,~,~,~] = kinematics(trainingData); % calculate x and y positions padded to maximum length
+    [x,y,x_avg,y_avg,x_vel,y_vel,x_acc,y_acc,~] = kinematics(trainingData); % calculate x and y positions padded to maximum length
     
     Trajectory.x_avg = x_avg; % store average trajectory as model parameter
     Trajectory.y_avg = y_avg;
-    x_std = squeeze(std(x,1));
+    x_std = squeeze(std(x,1)); % calculate standard deviation from the mean trajectory across trials for all angles
     y_std = squeeze(std(y,1));
     
     x_detrended = zeros(T,A,size(x,3));
@@ -47,6 +47,10 @@ function  [modelParameters] = positionEstimatorTraining_braniacs(trainingData)
             R_param(a,bin).y_avg_sampled = y_avg(a,range(bin));
             R_param(a,bin).x_std_sampled = x_std(a,range(bin)); % store standard deviation of positions at relevant locations
             R_param(a,bin).y_std_sampled = y_std(a,range(bin));
+            R_param(a,bin).x_vel_sampled = squeeze(mean(x_vel(a,range(bin)),1)); % store mean velocity at relevant locations
+            R_param(a,bin).y_vel_sampled = squeeze(mean(y_vel(a,range(bin)),1));
+            R_param(a,bin).x_acc_sampled = squeeze(mean(x_acc(a,range(bin)),1)); % store mean acceleration at relevant locations
+            R_param(a,bin).y_acc_sampled = squeeze(mean(y_acc(a,range(bin)),1));
     
             idx_angle = (a-1)*T+1; % angle range index (for each a)
             bin_idx = (range(bin)/dt); % bin range index (for each bin)
