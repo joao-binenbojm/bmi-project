@@ -39,18 +39,26 @@ function [x, y, newModelParameters] = positionEstimator_braniacs(testData, model
     idx_bin = length(fr_total)/98-(320/dt-1);
     update_x = param(pred_angle,idx_bin).update(:,1);
     update_y = param(pred_angle,idx_bin).update(:,2);
+    update_x_vel = param(pred_angle,idx_bin).update(:,3);
+    update_y_vel = param(pred_angle,idx_bin).update(:,4);
     fr_bin_avg = param(pred_angle,idx_bin).fr_bin_avg;
     x_avg_sampled = param(pred_angle,idx_bin).x_avg_sampled;
     y_avg_sampled = param(pred_angle,idx_bin).y_avg_sampled;
-    x_std_sampled = param(pred_angle,idx_bin).x_std_sampled;
-    y_std_sampled = param(pred_angle,idx_bin).y_std_sampled;
+    x_vel_sampled = param(pred_angle,idx_bin).x_vel_sampled;
+    y_vel_sampled = param(pred_angle,idx_bin).y_vel_sampled;
+
+    vx = (fr_total-fr_bin_avg)*update_x_vel+x_vel_sampled;
+    vy = (fr_total-fr_bin_avg)*update_y_vel+y_vel_sampled;
+      
+    if N == 320
+        x = x_avg_sampled+vx;
+        y = y_avg_sampled+vy;
+    else
+        x = x_avg_sampled+vx;
+        y = y_avg_sampled+vy;
+    end
     
-    x = (fr_total-fr_bin_avg)*update_x+x_avg_sampled;
-    y = (fr_total-fr_bin_avg)*update_y+y_avg_sampled;
-    
-    x = (x_std_sampled/10)*randn(1)+x;
-    y = (y_std_sampled/10)*randn(1)+y;
-    
+    modelParameters.pred_pos = [x y];
     newModelParameters = modelParameters;
 end
 
