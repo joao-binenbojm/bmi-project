@@ -26,8 +26,10 @@ function  [modelParameters] = positionEstimatorTraining_braniacs(trainingData)
     [fr_total,~] = fr_features(trainingData,20,N);
     [x,y,x_avg,y_avg,~,~,~,~,~] = kinematics(trainingData); % calculate x and y positions padded to maximum length
     
-    Trajectory.x = x_avg; % store average trajectory as model parameter
-    Trajectory.y = y_avg;
+    Trajectory.x_avg = x_avg; % store average trajectory as model parameter
+    Trajectory.y_avg = y_avg;
+    x_std = squeeze(std(x,1));
+    y_std = squeeze(std(y,1));
     
     x_detrended = zeros(T,A,size(x,3));
     y_detrended = zeros(T,A,size(x,3));
@@ -43,6 +45,8 @@ function  [modelParameters] = positionEstimatorTraining_braniacs(trainingData)
         for bin = 1:length(range)
             R_param(a,bin).x_avg_sampled = x_avg(a,range(bin)); % store mean positions at relevant locations
             R_param(a,bin).y_avg_sampled = y_avg(a,range(bin));
+            R_param(a,bin).x_std_sampled = x_std(a,range(bin)); % store standard deviation of positions at relevant locations
+            R_param(a,bin).y_std_sampled = y_std(a,range(bin));
     
             idx_angle = (a-1)*T+1; % angle range index (for each a)
             bin_idx = (range(bin)/dt); % bin range index (for each bin)
