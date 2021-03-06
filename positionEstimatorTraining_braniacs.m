@@ -53,6 +53,7 @@ function  [modelParameters] = positionEstimatorTraining_braniacs(trainingData)
             fr_bin = fr_total(idx_angle:idx_angle+T-1,1:98*bin_idx);
             bin_x = squeeze(x_detrended_sampled(:,a,bin));
             bin_y = squeeze(y_detrended_sampled(:,a,bin));
+            kin = [bin_x bin_y];
             
             fr_bin_avg = mean(fr_bin,1);
             
@@ -61,9 +62,8 @@ function  [modelParameters] = positionEstimatorTraining_braniacs(trainingData)
             P = PCA(fr_bin,fr_bin_avg,p);
             W = P'*(fr_bin'-fr_bin_avg');
             R_param(a,bin).fr_bin_avg=fr_bin_avg;
-            dx=P*(W*W')^(-1)*W* bin_x; % calculate linear regression
-            dy=P*(W*W')^(-1)*W* bin_y;
-            R_param(a,bin).update = [dx,dy];
+            update=P*(W*W')^(-1)*W*kin; % calculate linear regression
+            R_param(a,bin).update = update;
         end
     end
     
