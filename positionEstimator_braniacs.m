@@ -41,28 +41,37 @@ function [x, y, newModelParameters] = positionEstimator_braniacs(testData, model
     update_y = param(pred_angle,idx_bin).update(:,2);
     update_x_vel = param(pred_angle,idx_bin).update(:,3);
     update_y_vel = param(pred_angle,idx_bin).update(:,4);
+    update_x_acc = param(pred_angle,idx_bin).update(:,5);
+    update_y_acc = param(pred_angle,idx_bin).update(:,6);
     fr_bin_avg = param(pred_angle,idx_bin).fr_bin_avg;
     x_avg_sampled = param(pred_angle,idx_bin).x_avg_sampled;
     y_avg_sampled = param(pred_angle,idx_bin).y_avg_sampled;
     x_vel_sampled = param(pred_angle,idx_bin).x_vel_sampled;
     y_vel_sampled = param(pred_angle,idx_bin).y_vel_sampled;
+    x_acc_sampled = param(pred_angle,idx_bin).x_acc_sampled;
+    y_acc_sampled = param(pred_angle,idx_bin).y_acc_sampled;
     
-    x = (fr_total-fr_bin_avg)*update_x+x_avg_sampled;
-    y = (fr_total-fr_bin_avg)*update_y+y_avg_sampled;
+%     x = (fr_total-fr_bin_avg)*update_x+x_avg_sampled;
+%     y = (fr_total-fr_bin_avg)*update_y+y_avg_sampled;
+% 
+%     vx = (fr_total-fr_bin_avg)*update_x_vel+x_vel_sampled;
+%     vy = (fr_total-fr_bin_avg)*update_y_vel+y_vel_sampled;
 
-    vx = (fr_total-fr_bin_avg)*update_x_vel+x_vel_sampled;
-    vy = (fr_total-fr_bin_avg)*update_y_vel+y_vel_sampled;
+    acc_x = (fr_total-fr_bin_avg)*update_x_acc+x_acc_sampled;
+    acc_y = (fr_total-fr_bin_avg)*update_y_acc+y_acc_sampled;
       
-    if N == 320
-        x_prime = x_avg_sampled+vx;
-        y_prime = y_avg_sampled+vy;
-    else
-        x_prime = x_avg_sampled+vx;
-        y_prime = y_avg_sampled+vy;
-    end
+%     x_prime = x_avg_sampled+vx;
+%     y_prime = y_avg_sampled+vy;
+    vx_prime = x_vel_sampled+acc_x;
+    vy_prime = y_vel_sampled+acc_y;
+    x_prime = x_avg_sampled+vx_prime;
+    y_prime = y_avg_sampled+vy_prime;
     
-    x = (x+x_prime)/2;
-    y = (y+y_prime)/2;
+%     x = (x+x_prime)/2;
+%     y = (y+y_prime)/2;
+
+    x = x_prime;
+    y = y_prime;
     
     modelParameters.pred_pos = [x y];
     newModelParameters = modelParameters;
