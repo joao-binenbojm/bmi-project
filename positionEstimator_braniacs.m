@@ -57,8 +57,11 @@ function [x, y, newModelParameters] = positionEstimator_braniacs(testData, model
     vx = (fr_total-fr_bin_avg)*update_x_vel+x_vel_sampled;
     vy = (fr_total-fr_bin_avg)*update_y_vel+y_vel_sampled;
     
-    x = vx*dt+x_avg_sampled;
-    y = vy*dt+y_avg_sampled;
+    acc_x = (fr_total-fr_bin_avg)*update_x_acc+x_acc_sampled;
+    acc_y = (fr_total-fr_bin_avg)*update_y_acc+y_acc_sampled;
+    
+    x = 0.5*acc_x*dt^2+vx*dt+x_avg_sampled;
+    y = 0.5*acc_y*dt^2+vy*dt+y_avg_sampled;
     
 %     [theta,u] = cart2pol(vx,vy);
 %     if idx_bin<13
@@ -71,8 +74,6 @@ function [x, y, newModelParameters] = positionEstimator_braniacs(testData, model
 %         y = traj;
 %     end
     
-%     acc_x = (fr_total-fr_bin_avg)*update_x_acc+x_acc_sampled;
-%     acc_y = (fr_total-fr_bin_avg)*update_y_acc+y_acc_sampled;
 %       
 %     x_prime = x_avg_sampled+vx;
 %     y_prime = y_avg_sampled+vy;
