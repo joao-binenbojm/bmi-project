@@ -6,6 +6,8 @@
 
 function RMSE = testFunction_for_students_MTb_braniacs(teamName)
 
+addpath('funcs','data');
+
 load monkeydata0.mat
 
 % Set random number generator
