@@ -56,28 +56,22 @@ function [x, y, newModelParameters] = positionEstimator_braniacs(testData, model
 
     vx = (fr_total-fr_bin_avg)*update_x_vel+x_vel_sampled;
     vy = (fr_total-fr_bin_avg)*update_y_vel+y_vel_sampled;
-    
+
     acc_x = (fr_total-fr_bin_avg)*update_x_acc+x_acc_sampled;
     acc_y = (fr_total-fr_bin_avg)*update_y_acc+y_acc_sampled;
-   
-    if N==320  
-        x_prime = x_avg_sampled+vx;
-        y_prime = y_avg_sampled+vy;
-    else
-        x_prime = vx+(x_avg_sampled*5+modelParameters.vel_pred_x_avg_sampled)/6;
-        y_prime = vy+(y_avg_sampled*5+modelParameters.vel_pred_y_avg_sampled)/6;
-    end
+      
+    x_prime = x_avg_sampled+vx;
+    y_prime = y_avg_sampled+vy;
+    vx_prime_2 = x_vel_sampled+acc_x;
+    vy_prime_2 = y_vel_sampled+acc_y;
+    x_prime_2 = x_avg_sampled+vx_prime_2;
+    y_prime_2 = y_avg_sampled+vy_prime_2;
     
-%     vx_prime_2 = x_vel_sampled+acc_x;
-%     vy_prime_2 = y_vel_sampled+acc_y;
-%     x_prime_2 = x_avg_sampled+vx_prime_2;
-%     y_prime_2 = y_avg_sampled+vy_prime_2;
+    x = (x+x_prime+x_prime_2)/3;
+    y = (y+y_prime+y_prime_2)/3;
 
-    x = x_prime;
-    y = y_prime;
-
-    modelParameters.vel_pred_x_avg_sampled = x_prime;
-    modelParameters.vel_pred_y_avg_sampled = y_prime;
+%     x = x_prime;
+%     y = y_prime;
     
     modelParameters.pred_pos = [x y];
     newModelParameters = modelParameters;
