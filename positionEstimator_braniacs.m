@@ -64,8 +64,8 @@ function [x, y, newModelParameters] = positionEstimator_braniacs(testData, model
         x_prime = x_avg_sampled+vx;
         y_prime = y_avg_sampled+vy;
     else
-        x_prime = vx+(x_avg_sampled*10+modelParameters.vel_pred_x_avg_sampled)/11;
-        y_prime = vy+(y_avg_sampled*10+modelParameters.vel_pred_y_avg_sampled)/11;
+        x_prime = vx+(x_avg_sampled*5+modelParameters.vel_pred_x_avg_sampled)/6;
+        y_prime = vy+(y_avg_sampled*5+modelParameters.vel_pred_y_avg_sampled)/6;
     end
     
 %     vx_prime_2 = x_vel_sampled+acc_x;
