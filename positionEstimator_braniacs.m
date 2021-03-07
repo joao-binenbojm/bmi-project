@@ -56,22 +56,28 @@ function [x, y, newModelParameters] = positionEstimator_braniacs(testData, model
 
     vx = (fr_total-fr_bin_avg)*update_x_vel+x_vel_sampled;
     vy = (fr_total-fr_bin_avg)*update_y_vel+y_vel_sampled;
-
-    acc_x = (fr_total-fr_bin_avg)*update_x_acc+x_acc_sampled;
-    acc_y = (fr_total-fr_bin_avg)*update_y_acc+y_acc_sampled;
-      
-    x_prime = x_avg_sampled+vx;
-    y_prime = y_avg_sampled+vy;
-    vx_prime_2 = x_vel_sampled+acc_x;
-    vy_prime_2 = y_vel_sampled+acc_y;
-    x_prime_2 = x_avg_sampled+vx_prime_2;
-    y_prime_2 = y_avg_sampled+vy_prime_2;
     
-    x = (x+x_prime+x_prime_2)/3;
-    y = (y+y_prime+y_prime_2)/3;
-
-%     x = x_prime;
-%     y = y_prime;
+    [theta,u] = cart2pol(vx,vy);
+    if idx_bin<13
+        traj = tan(theta)*param(pred_angle,idx_bin+1).x_avg_sampled-(9.8/(2*u^2*cos(theta)^2))*param(pred_angle,idx_bin+1).x_avg_sampled.^2;
+        x = param(pred_angle,idx_bin+1).x_avg_sampled;
+    else
+        traj = tan(theta)*param(pred_angle,idx_bin).x_avg_sampled-(9.8/(2*u^2*cos(theta)^2))*param(pred_angle,idx_bin).x_avg_sampled.^2;
+        x = param(pred_angle,idx_bin).x_avg_sampled;
+    end
+    
+%     acc_x = (fr_total-fr_bin_avg)*update_x_acc+x_acc_sampled;
+%     acc_y = (fr_total-fr_bin_avg)*update_y_acc+y_acc_sampled;
+%       
+%     x_prime = x_avg_sampled+vx;
+%     y_prime = y_avg_sampled+vy;
+%     vx_prime_2 = x_vel_sampled+acc_x;
+%     vy_prime_2 = y_vel_sampled+acc_y;
+%     x_prime_2 = x_avg_sampled+vx_prime_2;
+%     y_prime_2 = y_avg_sampled+vy_prime_2;
+%     
+%     x = (x+x_prime+x_prime_2)/3;
+%     y = (y+y_prime+y_prime_2)/3;
     
     modelParameters.pred_pos = [x y];
     newModelParameters = modelParameters;
