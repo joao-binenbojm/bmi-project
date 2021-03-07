@@ -2,6 +2,8 @@
 
 clear p;
 
+addpath('funcs','data');
+
 load('monkeydata_training');
 
 data = section(trial);
