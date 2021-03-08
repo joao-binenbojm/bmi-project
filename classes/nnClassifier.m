@@ -61,7 +61,8 @@ classdef nnClassifier
             
             % Data variables
             X = obj.preprocess(trainingData);
-            Y = repmat([1:8], 1, length(trainingData));
+            Y = repmat([1:8],1,length(trainingData));
+            
             % Training model
             obj.model = trainNetwork(X, categorical(Y), obj.layers, obj.options);
         end
