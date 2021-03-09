@@ -68,34 +68,34 @@ classdef KalmanModel
 
             [T,A] = size(training_data); % get data size
             
-            X_A = zeros(4, 15000); % initialise variables
-            Y_A = zeros(4, 15000);
-            Y_H = zeros(98, 15000);
-            samp_count = 0;
+            X_A(1:A) = {zeros(4, 15000)}; % initialise variables
+            Y_A(1:A) = {zeros(4, 15000)};
+            Y_H(1:A) = {zeros(98, 15000)};
             
-            [~,~,x_avg,y_avg,x_vel,y_vel,~,~,~,obj] = obj.kinematics(training_data);
-            
-            for tr = 1:T
-                for direc = 1:A
+            for direc = 1:A
+                samp_count = 0;
+                for tr = 1:T
                     for t = 170:20:length(training_data(tr, direc).spikes)
                         samp_count = samp_count + 1;
-                        X_A(1:2, samp_count) = training_data(tr, direc).handPos(1:2, t-20)-[x_avg(direc,t-20);y_avg(direc,t-20)];
-                        X_A(3:4, samp_count) = (training_data(tr, direc).handPos(1:2, t-20)...
+                        X_A{direc}(1:2, samp_count) = training_data(tr, direc).handPos(1:2, t-20);
+                        X_A{direc}(3:4, samp_count) = (training_data(tr, direc).handPos(1:2, t-20)...
                             - training_data(tr, direc).handPos(1:2, t-40))/0.02;
-                        Y_A(1:2, samp_count) = training_data(tr, direc).handPos(1:2, t)-[x_avg(direc,t);y_avg(direc,t)];
-                        Y_A(3:4, samp_count) = (training_data(tr, direc).handPos(1:2, t)...
+                        Y_A{direc}(1:2, samp_count) = training_data(tr, direc).handPos(1:2, t);
+                        Y_A{direc}(3:4, samp_count) = (training_data(tr, direc).handPos(1:2, t)...
                             - training_data(tr, direc).handPos(1:2, t-20))/0.02;
-                        Y_H(:, samp_count) = mean(training_data(tr, direc).spikes(:, t-169:t-100), 2);
-                    end     
+                        Y_H{direc}(:, samp_count) = mean(training_data(tr, direc).spikes(:, t-169:t-100), 2);
+                    end
                 end
+                X_A(direc) = {X_A{direc}(:, 1:samp_count)}; % remove extra zero elements
+                X_H(direc) = {X_A{direc}(:, 1:samp_count)};
+                Y_A(direc) = {Y_A{direc}(:, 1:samp_count)};
+                
+                % Normalizing frequency data (saving params for later normalization)
+                obj.f_norm(direc).avg = mean(Y_H{direc}(:, 1:samp_count), 2);
+                obj.f_norm(direc).stdev = std(Y_H{direc}(:, 1:samp_count), [], 2);
+                Y_H(direc) = {(Y_H{direc}(:, 1:samp_count) - obj.f_norm(direc).avg)./obj.f_norm(direc).stdev};
             end
-            X_A = X_A(:, 1:samp_count); % remove extra zero elements
-            X_H = X_A(:, 1:samp_count);
-            Y_A = Y_A(:, 1:samp_count);
-            % Normalizing frequency data (saving params for later normalization)
-            obj.f_norm.avg = mean(Y_H(:, 1:samp_count), 2);
-            obj.f_norm.stdev = std(Y_H(:, 1:samp_count), [], 2);
-            Y_H = (Y_H(:, 1:samp_count) - obj.f_norm.avg)./obj.f_norm.stdev;
+         
         end
    
         function obj = fit(obj,training_data, A_npcr, H_npcr)
@@ -103,32 +103,34 @@ classdef KalmanModel
             %training data using PCR
             
             [X_A, Y_A, X_H, Y_H, obj] = obj.extract_supervised(training_data);
-            % PCR solution for A
-            [U,S,V] = svds(X_A, A_npcr);
-            obj.A = Y_A*(V/S)*U';
-            % OLS solution for H
-            [U,S,V] = svds(X_H, H_npcr);
-            obj.H = Y_H*(V/S)*U';
-            % Estimating covariance matrices (Wu et. al, 2002 notation)
-            obj.W = (Y_A - obj.A*X_A)*(Y_A - obj.A*X_A)'/(length(Y_A));
-            obj.Q = (Y_H - obj.H*X_H)*(Y_H - obj.H*X_H)'/(length(Y_H));
+            for a = 1:length(X_A) 
+                % PCR solution for A
+                [U,S,V] = svds(X_A{a}, A_npcr);
+                obj.A{a} = Y_A{a}*(V/S)*U';
+                % OLS solution for H
+                [U,S,V] = svds(X_H{a}, H_npcr);
+                obj.H{a} = Y_H{a}*(V/S)*U';
+                % Estimating covariance matrices (Wu et. al, 2002 notation)
+                obj.W{a} = (Y_A{a} - obj.A{a}*X_A{a})*(Y_A{a} - obj.A{a}*X_A{a})'/(length(Y_A{a}));
+                obj.Q{a} = (Y_H{a} - obj.H{a}*X_H{a})*(Y_H{a} - obj.H{a}*X_H{a})'/(length(Y_H{a}));
+            end
         end
-        function [x, y, obj] = predict(obj, test_data)
+        function [x, y, obj] = predict(obj, test_data, pred_angle)
             % Selecting past state value
             if length(test_data.spikes) <= 320
                 obj.x_past = [test_data.startHandPos; 0; 0]; % star at 0 velocity
-                obj.P_past = zeros(size(obj.W));
+                obj.P_past = zeros(size(obj.W{pred_angle}));
             end
             % Extracting observation information
             freqs = mean(test_data.spikes(:, end-169:end-100), 2);
-            freqs = (freqs - obj.f_norm.avg)./(obj.f_norm.stdev);
+            freqs = (freqs - obj.f_norm(pred_angle).avg)./(obj.f_norm(pred_angle).stdev);
             % 1. Prediction Step
-            x_priori = obj.A * obj.x_past;
-            P_priori = obj.A * obj.P_past * obj.A' + obj.W;
+            x_priori = obj.A{pred_angle} * obj.x_past;
+            P_priori = obj.A{pred_angle} * obj.P_past * obj.A{pred_angle}' + obj.W{pred_angle};
             % 2. Update Step
-            K = P_priori*obj.H'/(obj.H*P_priori*obj.H' + obj.Q); % Kalman Gain
-            x_current = x_priori + K*(freqs - obj.H*x_priori);
-            P_current = (eye(size(K, 1)) - K * obj.H)*P_priori;
+            K = P_priori*obj.H{pred_angle}'/(obj.H{pred_angle}*P_priori*obj.H{pred_angle}' + obj.Q{pred_angle}); % Kalman Gain
+            x_current = x_priori + K*(freqs - obj.H{pred_angle}*x_priori);
+            P_current = (eye(size(K, 1)) - K * obj.H{pred_angle})*P_priori;
             % Update appropriate quantities
             x = x_current(1); y = x_current(2);
             obj.P_past = P_current;
