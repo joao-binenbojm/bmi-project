@@ -46,7 +46,7 @@ function [x, y, model] = positionEstimator(test_data, model)
   % - [x, y]:
   %     current position of the hand
   
-  [x, y, model] = model.pos_estimator(test_data);
+  [x, y, model] = model.predict(test_data);
    
 end
 
