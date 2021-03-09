@@ -20,13 +20,16 @@ classdef KalmanModel
             % [X, Y] = EXTRACT_SUPERVISED(data) extracts data in the appropriate
             % format for supervised learning
 
-            [T,A] = size(training_data);
-            X_A = zeros(4, 15000); Y_A = zeros(4, 15000);
+            [T,A] = size(training_data); % get data size
+            
+            X_A = zeros(4, 15000); % initialise variables
+            Y_A = zeros(4, 15000);
             Y_H = zeros(98, 15000);
             samp_count = 0;
+            
             for tr = 1:T
                 for direc = 1:A
-                    for t = 320:20:length(training_data(tr, direc).spikes)
+                    for t = 170:20:length(training_data(tr, direc).spikes)
                         samp_count = samp_count + 1;
                         X_A(1:2, samp_count) = training_data(tr, direc).handPos(1:2, t-20);
                         X_A(3:4, samp_count) = (training_data(tr, direc).handPos(1:2, t-20)...
@@ -35,10 +38,10 @@ classdef KalmanModel
                         Y_A(3:4, samp_count) = (training_data(tr, direc).handPos(1:2, t)...
                             - training_data(tr, direc).handPos(1:2, t-20))/0.02;
                         Y_H(:, samp_count) = mean(training_data(tr, direc).spikes(:, t-169:t-100), 2);
-                    end
+                    end     
                 end
             end
-            X_A = X_A(:, 1:samp_count);
+            X_A = X_A(:, 1:samp_count); % remove extra zero elements
             X_H = X_A(:, 1:samp_count);
             Y_A = Y_A(:, 1:samp_count);
             % Normalizing frequency data (saving params for later normalization)
