@@ -70,8 +70,8 @@ function [x, y, newModelParameters] = positionEstimator_braniacs(testData, model
 %     x = (x+x_prime+x_prime_2)/3;
 %     y = (y+y_prime+y_prime_2)/3;
 
-%     x = x_prime;
-%     y = y_prime;
+    x = x_prime;
+    y = y_prime;
     
     modelParameters.pred_pos = [x y];
     newModelParameters = modelParameters;
