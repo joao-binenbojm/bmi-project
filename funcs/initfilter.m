@@ -1,20 +1,30 @@
-function data_out = initfilter(data,range)
+function data_out = initfilter(data,J,overlap)
     % [] = INITFILTER(data,range)
     % data - given struct array 
-    % range - float array of size 1x2, defines cutoff frequencies of
-    % bandpass in Hertz
+    % J - number of Hanning windows (new number of columns)
+    % overlap - percentage of overlap between windows (decimals)
     % data_out - filtered output in the same format as data 
 
-    data_out = data;
-    [T,A] = size(data);
+    data_cell = struct2cell(data); % convert to cell matrix
+    max_length = @(x) length(x); % function handle to get max length of all elements in cell
+    l = cellfun(max_length,data_cell);
+    N = max(squeeze(l(3,:,:)),[],'all');
+   
+    T = floor(N/((1-overlap)*J));
     
-    for i = 1:1:T
-        for j = 1:1:A
-            for k = 1:1:size(data(i,j).spikes,1)
-                var = data(i,j).spikes(k,:);
-                data_out(i,j).spikes(k,1:length(var)) = bandpass(var(1:length(var)),range,1);
-                var_out = data_out(i,j).spikes(k,:);
-                data_out(i,j).spikes(k,:) = var_out>0.5;
+    H = zeros(J,N);
+    for j = 1:J
+        shift = floor((j-1)*(1-overlap)*T);
+        H(j,1:T+shift) = [zeros(1,shift) hanning(T)'];
+    end
+    
+    H(:,floor(1:T/2)) = [];
+    
+    for a = 1:A
+        for t = 1:T
+            for u = 1:98
+                var = data(t,a).spikes(u,:);
+                
             end
         end
     end
