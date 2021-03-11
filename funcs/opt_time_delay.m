@@ -9,7 +9,7 @@ function [error,opt_lag] = opt_time_delay(data,dt,N,lag)
     % lag
     % opt_lag - struct array with optimal lag for each unit and angle
     
-    lag = lag/dt;
+    lag = lag/dt; % convert time to index
     
     [T,A] = size(data); % get trial and angle size
     
@@ -19,31 +19,31 @@ function [error,opt_lag] = opt_time_delay(data,dt,N,lag)
     
     error = zeros(98,A,length(lag));
     for l = 1:length(lag)
-        frFit = zeros(T,98,N/dt-lag(l));
+        frFit = zeros(T,98,N/dt-lag(l)); % initialise variables
         PSTH_est = zeros(98,N/dt-lag(l),A);
         PSTH_emp = zeros(98,N/dt-lag(l),A);
         for a = 1:1:A
             sel.angle = a;
             for t = 1:1:T
-                kin.x_vel = squeeze(x_vel(t,a,1:dt:N));
+                kin.x_vel = squeeze(x_vel(t,a,1:dt:N)); % get velocity at relevant locations
                 kin.y_vel = squeeze(y_vel(t,a,1:dt:N));
                 for u = 1:1:98
                     sel.unit = u;
-                    fr = fr_total(a:8:end,u:98:end);
-                    PSTH_emp(u,:,a) = sum(fr(:,1:end-lag(l)),1);
-                    fr = fr(t,1:end-lag(l))';
+                    fr = fr_total(a:8:end,u:98:end); % get spike count at relevant locations
+                    PSTH_emp(u,:,a) = sum(fr(:,1:end-lag(l)),1); % calculate empirical PSTH
+                    fr = fr(t,1:end-lag(l))'; % account for lag in spike data
                     numBins = size(fr,1);
-                    predictor = [ones(numBins,1) kin.x_vel(lag(l)+1:end) kin.y_vel(lag(l)+1:end)];
-                    coeff = glmfit(predictor(:,2:end),fr,'poisson');
-                    frFit(t,u,:) = exp(predictor*coeff); 
+                    predictor = [ones(numBins,1) kin.x_vel(lag(l)+1:end) kin.y_vel(lag(l)+1:end)]; % create predictor for Poisson distribution based on velocity
+                    coeff = glmfit(predictor(:,2:end),fr,'poisson'); % fit Poisson distribution to predictor based on spike counts
+                    frFit(t,u,:) = exp(predictor*coeff); % generate estimates of spike count 
                 end
             end
-            PSTH_est(:,:,a) = squeeze(sum(frFit,1));
+            PSTH_est(:,:,a) = squeeze(sum(frFit,1)); % use spike count estimate to generate a PSTH estimate
         end
-        error(:,:,l) = squeeze(mean(((PSTH_est-PSTH_emp).^2),2));
+        error(:,:,l) = squeeze(mean(((PSTH_est-PSTH_emp).^2),2)); % calculate MSE error between empirical and estimated PSTH
     end
     
-    [~,opt_lag] = min(error,[],3);
-    opt_lag = (opt_lag-1)*dt;
+    [~,opt_lag] = min(error,[],3); % define optimal lag as that which minimises MSE
+    opt_lag = (opt_lag-1)*dt; % convert index to time value
 end
 
