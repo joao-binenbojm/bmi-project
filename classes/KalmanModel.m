@@ -72,7 +72,7 @@ classdef KalmanModel
             X_A(1:A) = {zeros(4, 15000)}; % initialise variables
             Y_A(1:A) = {zeros(4, 15000)};
             Y_H(1:A) = {zeros(98, 15000)};
-            obj.V(1:A) = {[]};
+            obj.V = cell(1,8);
             
             for direc = 1:A
                 samp_count = 0;
@@ -95,7 +95,18 @@ classdef KalmanModel
                 % Normalizing frequency data (saving params for later normalization)
                 obj.f_norm(direc).avg = mean(Y_H{direc}(:, 1:samp_count), 2);
                 obj.f_norm(direc).stdev = std(Y_H{direc}(:, 1:samp_count), [], 2);
+                
                 Y_H(direc) = {(Y_H{direc}(:, 1:samp_count) - obj.f_norm(direc).avg)./obj.f_norm(direc).stdev};
+                Y_dummy = Y_H{direc}; % dummy variable for editing
+                Y_dummy(isnan(Y_dummy)) = 0; % no spiking
+                Y_dummy(isinf(Y_dummy)) = 0; % no spiking
+                Y_H(direc) = {Y_dummy};
+                C = cov(Y_H{direc}');
+                r = rank(C);
+                [V_eig,D] = eig(C);
+                [~,I] = maxk(abs(diag(D)),4);
+                obj.V(direc) = {V_eig(:, I)};
+                Y_H(direc) = {(Y_H{direc}'*obj.V{direc})'}; % Projection onto PCA subspace
                 
             end
          
@@ -108,11 +119,11 @@ classdef KalmanModel
             [X_A, Y_A, X_H, Y_H, obj] = obj.extract_supervised(training_data);
             for a = 1:length(X_A) 
                 % PCR solution for A
-                [U,S,V] = svds(X_A{a}, A_npcr);
-                obj.A{a} = Y_A{a}*(V/S)*U';
+                [U,S,V_eig] = svds(X_A{a}, A_npcr);
+                obj.A{a} = Y_A{a}*(V_eig/S)*U';
                 % OLS solution for H
-                [U,S,V] = svds(X_H{a}, H_npcr);
-                obj.H{a} = Y_H{a}*(V/S)*U';
+                [U,S,V_eig] = svds(X_H{a}, H_npcr);
+                obj.H{a} = Y_H{a}*(V_eig/S)*U';
                 % Estimating covariance matrices (Wu et. al, 2002 notation)
                 obj.W{a} = (Y_A{a} - obj.A{a}*X_A{a})*(Y_A{a} - obj.A{a}*X_A{a})'/(length(Y_A{a}));
                 obj.Q{a} = (Y_H{a} - obj.H{a}*X_H{a})*(Y_H{a} - obj.H{a}*X_H{a})'/(length(Y_H{a}));
@@ -127,6 +138,9 @@ classdef KalmanModel
             % Extracting observation information
             freqs = mean(test_data.spikes(:, end-179:end-100), 2);
             freqs = (freqs - obj.f_norm(pred_angle).avg)./(obj.f_norm(pred_angle).stdev);
+            freqs(isnan(freqs)) = 0;
+            freqs(isinf(freqs)) = 0;
+            freqs = (freqs' * obj.V{pred_angle})';
             % 1. Prediction Step
             x_priori = obj.A{pred_angle} * obj.x_past;
             P_priori = obj.A{pred_angle} * obj.P_past * obj.A{pred_angle}' + obj.W{pred_angle};
@@ -136,6 +150,10 @@ classdef KalmanModel
             P_current = (eye(size(K, 1)) - K * obj.H{pred_angle})*P_priori;
             % Update appropriate quantities
             x = x_current(1); y = x_current(2);
+            if isnan(x) || isnan(y)
+                save('gay.mat')
+                asjklhbdflkjaslfk
+            end
             obj.P_past = P_current;
             obj.x_past = x_current;
         end
