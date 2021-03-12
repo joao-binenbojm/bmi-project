@@ -95,11 +95,12 @@ classdef KalmanModel
             obj.f_norm.avg = mean(Y_H(:, 1:samp_count), 2);
             obj.f_norm.stdev = std(Y_H(:, 1:samp_count), [], 2);
             Y_H = (Y_H(:, 1:samp_count) - obj.f_norm.avg)./obj.f_norm.stdev;
+            Y_H(isnan(Y_H)) = 0;
+            Y_H(isinf(Y_H)) = 0;
             C = cov(Y_H');
-            r = rank(C);
-            [V,D] = eig(C);
-            [~,I] = maxk(diag(D),r);
-            obj.V = V(:, I);
+            [V_eig,D] = eig(C);
+            [~,I] = maxk(abs(diag(D)), 97);
+            obj.V = V_eig(:, I);
             Y_H = (Y_H'*obj.V)'; % Projection onto PCA subspace
         end
    
@@ -127,6 +128,8 @@ classdef KalmanModel
             % Extracting observation information
             freqs = mean(test_data.spikes(:, end-179:end-100), 2);
             freqs = (freqs - obj.f_norm.avg)./(obj.f_norm.stdev);
+            freqs(isnan(freqs)) = 0;
+            freqs(isinf(freqs)) = 0;
             freqs = (freqs'*obj.V)';
             % 1. Prediction Step
             x_priori = obj.A * obj.x_past;
