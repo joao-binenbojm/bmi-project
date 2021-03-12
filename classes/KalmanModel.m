@@ -75,7 +75,7 @@ classdef KalmanModel
             for direc = 1:A
                 samp_count = 0;
                 for tr = 1:T
-                    for t = 170:20:length(training_data(tr, direc).spikes)
+                    for t = 180:20:length(training_data(tr, direc).spikes)
                         samp_count = samp_count + 1;
                         X_A{direc}(1:2, samp_count) = training_data(tr, direc).handPos(1:2, t-20);
                         X_A{direc}(3:4, samp_count) = (training_data(tr, direc).handPos(1:2, t-20)...
@@ -83,7 +83,7 @@ classdef KalmanModel
                         Y_A{direc}(1:2, samp_count) = training_data(tr, direc).handPos(1:2, t);
                         Y_A{direc}(3:4, samp_count) = (training_data(tr, direc).handPos(1:2, t)...
                             - training_data(tr, direc).handPos(1:2, t-20))/0.02;
-                        Y_H{direc}(:, samp_count) = mean(training_data(tr, direc).spikes(:, t-169:t-100), 2);
+                        Y_H{direc}(:, samp_count) = mean(training_data(tr, direc).spikes(:, t-179:t-100), 2);
                     end
                 end
                 X_A(direc) = {X_A{direc}(:, 1:samp_count)}; % remove extra zero elements
@@ -118,11 +118,11 @@ classdef KalmanModel
         function [x, y, obj] = predict(obj, test_data, pred_angle)
             % Selecting past state value
             if length(test_data.spikes) <= 320
-                obj.x_past = [test_data.startHandPos; 0; 0]; % star at 0 velocity
+                obj.x_past = [test_data.startHandPos; 0; 0]; % start at 0 velocity
                 obj.P_past = zeros(size(obj.W{pred_angle}));
             end
             % Extracting observation information
-            freqs = mean(test_data.spikes(:, end-169:end-100), 2);
+            freqs = mean(test_data.spikes(:, end-179:end-100), 2);
             freqs = (freqs - obj.f_norm(pred_angle).avg)./(obj.f_norm(pred_angle).stdev);
             % 1. Prediction Step
             x_priori = obj.A{pred_angle} * obj.x_past;
