@@ -9,6 +9,7 @@ classdef KalmanModel
         P_past
         x_past
         f_norm
+        V
     end
     
     methods
@@ -71,6 +72,7 @@ classdef KalmanModel
             X_A(1:A) = {zeros(4, 15000)}; % initialise variables
             Y_A(1:A) = {zeros(4, 15000)};
             Y_H(1:A) = {zeros(98, 15000)};
+            obj.V(1:A) = {[]};
             
             for direc = 1:A
                 samp_count = 0;
@@ -94,6 +96,7 @@ classdef KalmanModel
                 obj.f_norm(direc).avg = mean(Y_H{direc}(:, 1:samp_count), 2);
                 obj.f_norm(direc).stdev = std(Y_H{direc}(:, 1:samp_count), [], 2);
                 Y_H(direc) = {(Y_H{direc}(:, 1:samp_count) - obj.f_norm(direc).avg)./obj.f_norm(direc).stdev};
+                
             end
          
         end
