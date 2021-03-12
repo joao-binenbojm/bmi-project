@@ -109,7 +109,7 @@ classdef KalmanModel
             
             [X_A, Y_A, X_H, Y_H, obj] = obj.extract_supervised(training_data);
             % PCR solution for A
-            [U,S,V] = svds(X_A, A_npcr);
+            [U,S,V] = svds(X_A, A_npcr); 
             obj.A = Y_A*(V/S)*U';
             % OLS solution for H
             [U,S,V] = svds(X_H, H_npcr);
