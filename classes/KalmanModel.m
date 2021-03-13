@@ -2,6 +2,8 @@ classdef KalmanModel
     %KALMANMODEL Model that accounts for learning matrices A and H
     
     properties
+        bw
+        delay
         A
         H
         Q
@@ -15,6 +17,8 @@ classdef KalmanModel
     methods
         function obj = KalmanModel()
             %KALMANMODEL Construct an instance of this class
+            obj.bw = 40;
+            obj.delay = 30;
         end
         
         function [x,y,x_avg,y_avg,x_vel,y_vel,x_acc,y_acc,l,obj] = kinematics(obj,data)
@@ -69,15 +73,15 @@ classdef KalmanModel
 
             [T,A] = size(training_data); % get data size
             
-            X_A(1:A) = {zeros(4, 15000)}; % initialise variables
-            Y_A(1:A) = {zeros(4, 15000)};
-            Y_H(1:A) = {zeros(98, 15000)};
+            X_A(1:A) = {zeros(4, 1e5)}; % initialise variables
+            Y_A(1:A) = {zeros(4, 1e5)};
+            Y_H(1:A) = {zeros(98, 1e5)};
             obj.V = cell(1,8);
             
             for direc = 1:A
                 samp_count = 0;
                 for tr = 1:T
-                    for t = 180:20:length(training_data(tr, direc).spikes)
+                    for t = obj.bw+obj.delay:20:length(training_data(tr, direc).spikes)
                         samp_count = samp_count + 1;
                         X_A{direc}(1:2, samp_count) = training_data(tr, direc).handPos(1:2, t-20);
                         X_A{direc}(3:4, samp_count) = (training_data(tr, direc).handPos(1:2, t-20)...
@@ -85,7 +89,7 @@ classdef KalmanModel
                         Y_A{direc}(1:2, samp_count) = training_data(tr, direc).handPos(1:2, t);
                         Y_A{direc}(3:4, samp_count) = (training_data(tr, direc).handPos(1:2, t)...
                             - training_data(tr, direc).handPos(1:2, t-20))/0.02;
-                        Y_H{direc}(:, samp_count) = mean(training_data(tr, direc).spikes(:, t-179:t-100), 2);
+                        Y_H{direc}(:, samp_count) = mean(training_data(tr, direc).spikes(:, t-obj.bw-obj.delay+1:t-obj.delay), 2);
                     end
                 end
                 X_A(direc) = {X_A{direc}(:, 1:samp_count)}; % remove extra zero elements
@@ -136,7 +140,7 @@ classdef KalmanModel
                 obj.P_past = zeros(size(obj.W{pred_angle}));
             end
             % Extracting observation information
-            freqs = mean(test_data.spikes(:, end-179:end-100), 2);
+            freqs = mean(test_data.spikes(:, end-obj.bw-obj.delay+1:end-obj.delay), 2);
             freqs = (freqs - obj.f_norm(pred_angle).avg)./(obj.f_norm(pred_angle).stdev);
             freqs(isnan(freqs)) = 0;
             freqs(isinf(freqs)) = 0;
@@ -150,10 +154,6 @@ classdef KalmanModel
             P_current = (eye(size(K, 1)) - K * obj.H{pred_angle})*P_priori;
             % Update appropriate quantities
             x = x_current(1); y = x_current(2);
-            if isnan(x) || isnan(y)
-                save('gay.mat')
-                asjklhbdflkjaslfk
-            end
             obj.P_past = P_current;
             obj.x_past = x_current;
         end
