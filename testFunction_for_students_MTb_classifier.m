@@ -48,7 +48,7 @@ for tr=1:size(testData,1)
             past_current_trial.startHandPos = testData(tr,direc).handPos(1:2,1); 
             
             if nargout('positionEstimator_classifier') == 3
-                modelParameters.pred_angle = direc;
+                modelParameters.real_angle = direc;
                 [decodedPosX, decodedPosY, newParameters] = positionEstimator_classifier(past_current_trial, modelParameters);
                 modelParameters = newParameters;
             elseif nargout('positionEstimator_classifier') == 2

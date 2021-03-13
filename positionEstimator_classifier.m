@@ -26,13 +26,14 @@ function [x, y, newModelParameters] = positionEstimator_classifier(testData, mod
         pred_angle_SVM = modelParameters.pred_angle;
     end 
     
-    modelParameters.percentage = modelParameters.percentage + (modelParameters.pred_angle==pred_angle_SVM);
+    modelParameters.percentage = modelParameters.percentage + (modelParameters.real_angle==pred_angle_SVM);
     modelParameters.counter = modelParameters.counter + 1;
     
     pred_angle_NN = C_param.NN.predict(testData); % classify angle from NN
     
     % majority voting
     pred_angle = pred_angle_SVM;
+    modelParameters.pred_angle = pred_angle;
     
     % PCR regressor testing
     
