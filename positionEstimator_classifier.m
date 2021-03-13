@@ -1,4 +1,4 @@
-function [x, y, newModelParameters] = positionEstimator_braniacs(testData, modelParameters)
+function [x, y, newModelParameters] = positionEstimator_classifier(testData, modelParameters)
     % - test_data:
     % test_data(m).trialID
     % unique trial ID
@@ -13,28 +13,26 @@ function [x, y, newModelParameters] = positionEstimator_braniacs(testData, model
     % test_data(m).spikes(i,t) (m = trial id, i = neuron id, t = time)
     % in this case, t goes from 1 to the current time in steps of 20
     
-    % Classification testing
-    
-    % LDA testing
     N = length(testData.spikes); % get trial length
     
+    % Classification testing
     C_param = modelParameters.C_param; % extract classification parameters
+    
     if N==320 || N==400 || N==480 || N==560
-        [~,fr_avg] = fr_features(testData,80,N); % preprocess EEG data
-        pred_angle = predict(C_param.Mdl_LDA,fr_avg); % classify angle from LDA 
+        pred_angle_LDA = C_param.LDA.predict(testData); % classify angle from LDA 
         modelParameters.fr_avg = fr_avg;
         %modelParameters.pred_angle = pred_angle;
     %else
         %pred_angle = modelParameters.pred_angle;
-    end
-    fr_avg = modelParameters.fr_avg;
+%     end
+%     fr_avg = modelParameters.fr_avg;
     
-    % SVM testing
-    pred_angle_SVM = SVM_testing(fr_avg,C_param.Mdl_SVM);
+    pred_angle_SVM = C_param.SVM.predict(testData); % classify angle from SVM 
     pred_angle = pred_angle_SVM;
     modelParameters.percentage = modelParameters.percentage + (modelParameters.pred_angle==pred_angle_SVM);
     modelParameters.counter = modelParameters.counter + 1;
-    % NN testing
+    
+    pred_angle_NN = C_param.NN.predict(testData); % classify angle from NN
     
     % majority voting
     

@@ -1,4 +1,4 @@
-function  [modelParameters] = positionEstimatorTraining_braniacs(trainingData)
+function  [modelParameters] = positionEstimatorTraining_classifier(trainingData)
     % - trainingData:
     %     trainingData(t,a)              (t = trial id,  k = reaching angle)
     %     trainingData(t,a).trialId      unique number of the trial
@@ -9,22 +9,17 @@ function  [modelParameters] = positionEstimatorTraining_braniacs(trainingData)
     
     C_param = struct;
     R_param = struct;
-    N = 560; % define end time
     
-    [~,fr_avg] = fr_features(trainingData,80,N); % obtaining firing rate feature space from training data
+    % Classification training
     
-    % LDA classifier training
-    Y=repmat([1:1:8]',T,1); % generate labels for classifier 
-    C_param.Mdl_LDA = fitcdiscr(fr_avg,Y); % LDA classifier object
+    class = Classifier(); % create Classifier class
     
-    % Neural Network
-    %model = nnClassifier();
-    %C_param.Mdl_NN = model.fit(trainingData);
-    
-    % SVM
     C = 1; % regularization
     s = 0.1; % variance
-    C_param.Mdl_SVM = SVM_gaussian_kernel(fr_avg,Y,C,s);
+    
+    C_param.LDA = class.LDA.fit(trainingData); % LDA classifier
+    C_param.SVM = class.SVM.fit(trainingData,C,s); % SVM classifier
+    C_param.NN = class.NN.fit(trainingData); % NN classifier
     
     % PCR regressor training
     
