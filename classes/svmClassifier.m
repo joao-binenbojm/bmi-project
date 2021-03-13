@@ -378,10 +378,11 @@ classdef svmClassifier < handle
             obj.model = out;
         end
         
-        function [out,obj] = predict(obj,testData,N)
+        function [out,obj] = predict(obj,testData)
             %PREDICT(testData,N) uses trained model to generate labels on
             %test data
             
+            N = length(testData);
             [~,fr_avg] = obj.fr_features(testData,80,N); % preprocess EEG data
 
             pred_1 = obj.svmPredict(obj.model.model1_3456_1278,fr_avg(1,:));

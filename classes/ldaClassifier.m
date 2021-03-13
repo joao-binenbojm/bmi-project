@@ -57,10 +57,11 @@ classdef ldaClassifier < handle
             obj.model = fitcdiscr(fr_avg,Y); % LDA classifier object
         end
         
-        function [out,obj] = predict(obj,testData,N)
+        function [out,obj] = predict(obj,testData)
             %PREDICT(testData,N) uses trained model to generate labels on
             %test data
             
+            N = length(testData);
             [~,fr_avg] = obj.fr_features(testData,80,N); % preprocess EEG data
             out = predict(obj.model,fr_avg); % classify angle from LDA
             obj.pred_angle = out;
