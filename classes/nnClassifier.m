@@ -1,4 +1,4 @@
-classdef nnClassifier
+classdef nnClassifier < handle
     %NNCLASSIFIER neural network classifier
     %   Simple, shallow MLP classifier using pre-movement data
     
