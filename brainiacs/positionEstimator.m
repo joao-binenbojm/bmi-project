@@ -58,7 +58,6 @@ function [x, y, model] = positionEstimator(test_data, model)
   else
       pred_angle = model.C_param.pred_angle;
   end
-  
   % Kalman filter testing
   
   [x, y, model.K_param] = model.K_param.predict(test_data,pred_angle);
