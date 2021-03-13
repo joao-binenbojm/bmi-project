@@ -14,33 +14,63 @@ function predict = SVM_gaussian_kernel(fr_avg,labels,C,s)
     % 3, 4 (1) - 5, 6 (0)
     l2_low = labels(~l);
     l2_low_log = labels(l2_low)<5;
-    model2_low = svmTrain(fr_avg(rem(repmat([1:800],4,1),[3,4,5,6]'),:), double(l2_low_log), C, @(x1, x2) gaussianKernel(x1, x2, s));
+    test = [3:6]';
+    test = repmat(test,1,101);
+    Test = test+repmat([0:8:800],size(test,1),1);
+    Test = reshape(Test,1,101*size(test,1));
+    Test(Test>800) = []; 
+    model2_low = svmTrain(fr_avg(Test,:), double(l2_low_log), C, @(x1, x2) gaussianKernel(x1, x2, s));
     
     % 1, 2 (1) - 7, 8 (0)
     l2_high = labels(l);
     l2_high_log = labels(l2_high)<3;
-    model2_high = svmTrain(fr_avg(301:700,:), double(l2_high_log), C, @(x1, x2) gaussianKernel(x1, x2, s));
+    test = [1,2,7,8]';
+    test = repmat(test,1,101);
+    Test = test+repmat([0:8:800],size(test,1),1);
+    Test = reshape(Test,1,101*size(test,1));
+    Test(Test>800) = []; 
+    model2_high = svmTrain(fr_avg(Test,:), double(l2_high_log), C, @(x1, x2) gaussianKernel(x1, x2, s));
     
     % CLASSIFICATION 3
     % 1 (1) - 2 (0)
     l3_high_low = l2_high(l2_high_log); 
     l3_high_low_log = l2_high(l3_high_low)<2;
-    model3_high_low = svmTrain(fr_avg(1:200,:), double(l3_high_low_log), C, @(x1, x2) gaussianKernel(x1, x2, s));
+    test = [1,2]';
+    test = repmat(test,1,101);
+    Test = test+repmat([0:8:800],size(test,1),1);
+    Test = reshape(Test,1,101*size(test,1));
+    Test(Test>800) = []; 
+    model3_high_low = svmTrain(fr_avg(Test,:), double(l3_high_low_log), C, @(x1, x2) gaussianKernel(x1, x2, s));
     
     % 7 (1) - 8 (0)
     l3_high_high = l2_high(~l2_high_log); 
     l3_high_high_log = l2_high(l3_high_high)<8;
-    model3_high_high = svmTrain(fr_avg(701:200,:), double(l3_high_high_log), C, @(x1, x2) gaussianKernel(x1, x2, s));
+    test = [7,8]';
+    test = repmat(test,1,101);
+    Test = test+repmat([0:8:800],size(test,1),1);
+    Test = reshape(Test,1,101*size(test,1));
+    Test(Test>800) = []; 
+    model3_high_high = svmTrain(fr_avg(Test,:), double(l3_high_high_log), C, @(x1, x2) gaussianKernel(x1, x2, s));
     
     % 3 (1) - 4 (0)
     l3_low_low = l2_low(l2_low_log);
     l3_low_low_log = l2_low(l3_low_low)<4;
-    model3_low_low = svmTrain(fr_avg(701:200,:), double(l3_low_low_log), C, @(x1, x2) gaussianKernel(x1, x2, s));
+    test = [3,4]';
+    test = repmat(test,1,101);
+    Test = test+repmat([0:8:800],size(test,1),1);
+    Test = reshape(Test,1,101*size(test,1));
+    Test(Test>800) = []; 
+    model3_low_low = svmTrain(fr_avg(Test,:), double(l3_low_low_log), C, @(x1, x2) gaussianKernel(x1, x2, s));
     
     % 5 (1) - 6 (0)
     l3_low_high = l2_low(~l2_low_log); 
     l3_low_high_log = l2_low(l3_low_high)<8;
-    model3_low_high = svmTrain(fr_avg(701:200,:), double(l3_low_high_log), C, @(x1, x2) gaussianKernel(x1, x2, s));
+    test = [5,6]';
+    test = repmat(test,1,101);
+    Test = test+repmat([0:8:800],size(test,1),1);
+    Test = reshape(Test,1,101*size(test,1));
+    Test(Test>800) = []; 
+    model3_low_high = svmTrain(fr_avg(Test,:), double(l3_low_high_log), C, @(x1, x2) gaussianKernel(x1, x2, s));
     
     predict.model1 = model1;
     predict.model2_low = model2_low;
