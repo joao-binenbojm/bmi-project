@@ -1,5 +1,5 @@
 function data_out = initfilter(data,J,overlap,window)
-    % [] = INITFILTER(data,range)
+    % data_out = INITFILTER(data,J,overlap,window)
     % data - given struct array 
     % J - number of Hanning windows (new number of columns)
     % overlap - percentage of overlap between windows (decimals)
@@ -13,7 +13,7 @@ function data_out = initfilter(data,J,overlap,window)
     l = cellfun(max_length,data_cell);
     N = max(squeeze(l(3,:,:)),[],'all'); % get maximum length
    
-    L = round(N/(0.5+(1-overlap)*(J-1))); % determine window size
+    L = ceil(N/(0.5+(1-overlap)*(J-1))); % determine window size
     
     H = zeros(J,N);
     for j = 1:J % create matrix with shifted versions of given window defined by overlap
