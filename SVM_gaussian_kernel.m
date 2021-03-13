@@ -32,28 +32,28 @@ function predict = SVM_gaussian_kernel(fr_avg,labels,C,s)
     l3_high_low_log = l2_high(l3_high_low)<2;
     idx = labels<3;
     model3_high_low = svmTrain(fr_avg(idx,:), double(l3_high_low_log), C, @(x1, x2) gaussianKernel(x1, x2, s));
-    LDA_1_2 = fitctree(fr_avg(idx,:),double(l3_high_low_log));
+    LDA_1_2 = fitcdiscr(fr_avg(idx,:),double(l3_high_low_log));
     
     % 7 (1) - 8 (0)
     l3_high_high = l2_high(~l2_high_log); 
     l3_high_high_log = l2_high(l3_high_high)<8;
     idx = labels>6;
     model3_high_high = svmTrain(fr_avg(idx,:), double(l3_high_high_log), C, @(x1, x2) gaussianKernel(x1, x2, s));
-    LDA_7_8 = fitctree(fr_avg(idx,:),double(l3_high_high_log));
+    LDA_7_8 = fitcdiscr(fr_avg(idx,:),double(l3_high_high_log));
     
     % 3 (1) - 4 (0)
     l3_low_low = l2_low(l2_low_log);
     l3_low_low_log = l3_low_low<4;
     idx = and((labels>2),(labels<5));
     model3_low_low = svmTrain(fr_avg(idx,:), double(l3_low_low_log), C, @(x1, x2) gaussianKernel(x1, x2, s));
-    LDA_3_4 = fitctree(fr_avg(idx,:),double(l3_low_low_log));
+    LDA_3_4 = fitcdiscr(fr_avg(idx,:),double(l3_low_low_log));
     
     % 5 (1) - 6 (0)
     l3_low_high = l2_low(~l2_low_log); 
     l3_low_high_log = l3_low_high<6;
     idx = and((labels>4),(labels<7));
     model3_low_high = svmTrain(fr_avg(idx,:), double(l3_low_high_log), C, @(x1, x2) gaussianKernel(x1, x2, s));
-    LDA_5_6 = fitctree(fr_avg(idx,:),double(l3_low_high_log));
+    LDA_5_6 = fitcdiscr(fr_avg(idx,:),double(l3_low_high_log));
     
     predict.model1_3456_1278 = model1;
     predict.model2_34_56 = model2_low;
