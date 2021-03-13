@@ -24,6 +24,7 @@ function  [modelParameters] = positionEstimatorTraining_classifier(trainingData)
     % PCR regressor training
     
     dt = 20; % define time step
+    N = 560; % define time limit
     range = 320:dt:N; % define relevant time steps
     
     [fr_total,~] = fr_features(trainingData,20,N);

@@ -366,13 +366,13 @@ classdef svmClassifier < handle
             predict.model2_34_56 = model2_low;
             predict.model2_12_78 = model2_high;
             predict.model3_1_2 = model3_high_low;
-            predict.LDA_1_2 = LDA_1_2;
+%             predict.LDA_1_2 = LDA_1_2;
             predict.model3_7_8 = model3_high_high;
-            predict.LDA_7_8 = LDA_7_8;
+%             predict.LDA_7_8 = LDA_7_8;
             predict.model3_3_4 = model3_low_low;
-            predict.LDA_3_4 = LDA_3_4;
+%             predict.LDA_3_4 = LDA_3_4;
             predict.model3_5_6 = model3_low_high;
-            predict.LDA_5_6 = LDA_5_6;
+%             predict.LDA_5_6 = LDA_5_6;
             
             out = predict;
             obj.model = out;
@@ -382,7 +382,7 @@ classdef svmClassifier < handle
             %PREDICT(testData,N) uses trained model to generate labels on
             %test data
             
-            N = length(testData);
+            N = length(testData.spikes);
             [~,fr_avg] = obj.fr_features(testData,80,N); % preprocess EEG data
 
             pred_1 = obj.svmPredict(obj.model.model1_3456_1278,fr_avg(1,:));

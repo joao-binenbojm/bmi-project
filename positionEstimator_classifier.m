@@ -20,11 +20,11 @@ function [x, y, newModelParameters] = positionEstimator_classifier(testData, mod
     
     if N==320 || N==400 || N==480 || N==560
         pred_angle_LDA = C_param.LDA.predict(testData); % classify angle from LDA 
+        pred_angle_SVM = C_param.SVM.predict(testData); % classify angle from SVM
     else
         pred_angle_LDA = modelParameters.pred_angle;
-    end
-    
-    pred_angle_SVM = C_param.SVM.predict(testData); % classify angle from SVM 
+        pred_angle_SVM = modelParameters.pred_angle;
+    end 
     
     modelParameters.percentage = modelParameters.percentage + (modelParameters.pred_angle==pred_angle_SVM);
     modelParameters.counter = modelParameters.counter + 1;
