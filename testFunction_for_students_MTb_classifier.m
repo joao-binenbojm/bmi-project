@@ -4,7 +4,7 @@
 % the relevant modelParameters, and then calls the function
 % "positionEstimator" to decode the trajectory. 
 
-function RMSE = testFunction_for_students_MTb_braniacs(teamName)
+function RMSE = testFunction_for_students_MTb_classifier(teamName)
 
 addpath('funcs','data');
 
@@ -28,7 +28,7 @@ hold on
 axis square
 grid
 % Train Model
-modelParameters = positionEstimatorTraining_braniacs(trainingData);
+modelParameters = positionEstimatorTraining_classifier(trainingData);
 modelParameters.percentage = 0;
 modelParameters.counter = 0;
 
@@ -49,10 +49,10 @@ for tr=1:size(testData,1)
             
             if nargout('positionEstimator_braniacs') == 3
                 modelParameters.pred_angle = direc;
-                [decodedPosX, decodedPosY, newParameters] = positionEstimator_braniacs(past_current_trial, modelParameters);
+                [decodedPosX, decodedPosY, newParameters] = positionEstimator_classifier(past_current_trial, modelParameters);
                 modelParameters = newParameters;
             elseif nargout('positionEstimator_braniacs') == 2
-                [decodedPosX, decodedPosY] = positionEstimator_braniacs(past_current_trial, modelParameters);
+                [decodedPosX, decodedPosY] = positionEstimator_classifier(past_current_trial, modelParameters);
             end
             
             decodedPos = [decodedPosX; decodedPosY];

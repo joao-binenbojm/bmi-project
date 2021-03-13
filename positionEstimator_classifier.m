@@ -20,21 +20,19 @@ function [x, y, newModelParameters] = positionEstimator_classifier(testData, mod
     
     if N==320 || N==400 || N==480 || N==560
         pred_angle_LDA = C_param.LDA.predict(testData); % classify angle from LDA 
-        modelParameters.fr_avg = fr_avg;
-        %modelParameters.pred_angle = pred_angle;
-    %else
-        %pred_angle = modelParameters.pred_angle;
-%     end
-%     fr_avg = modelParameters.fr_avg;
+    else
+        pred_angle_LDA = modelParameters.pred_angle;
+    end
     
     pred_angle_SVM = C_param.SVM.predict(testData); % classify angle from SVM 
-    pred_angle = pred_angle_SVM;
+    
     modelParameters.percentage = modelParameters.percentage + (modelParameters.pred_angle==pred_angle_SVM);
     modelParameters.counter = modelParameters.counter + 1;
     
     pred_angle_NN = C_param.NN.predict(testData); % classify angle from NN
     
     % majority voting
+    pred_angle = pred_angle_SVM;
     
     % PCR regressor testing
     
