@@ -319,22 +319,22 @@ classdef svmClassifier < handle
             % right(0): 3, 4, 5, 6 - left(1): 1, 2, 7, 8
             l = or((labels<=2),(labels>=7));
 %             model1 = obj.svmTrain(fr_avg, double(l), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
-            TREE_3456_1278 = fitctree(fr_avg,double(l));
+            LDA_3456_1278 = fitcdiscr(fr_avg,double(l));
             
             % CLASSIFICATION 2
             % 3, 4 (1) - 5, 6 (0)
             l2_low = labels(~l);
             l2_low_log = labels(l2_low)<5;
             idx = ~l;
-            model2_low = obj.svmTrain(fr_avg(idx,:), double(l2_low_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
-%             TREE_34_56 = fitctree(fr_avg(idx,:),double(l2_low_log));
+%             model2_low = obj.svmTrain(fr_avg(idx,:), double(l2_low_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
+            LDA_34_56 = fitcdiscr(fr_avg(idx,:),double(l2_low_log));
             
             % 1, 2 (1) - 7, 8 (0)
             l2_high = labels(l);
             l2_high_log = labels(l2_high)<3;
             idx = l;
-            model2_high = obj.svmTrain(fr_avg(idx,:), double(l2_high_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
-%             TREE_12_78 = fitctree(fr_avg(idx,:),double(l2_high_log));
+%             model2_high = obj.svmTrain(fr_avg(idx,:), double(l2_high_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
+            LDA_12_78 = fitcdiscr(fr_avg(idx,:),double(l2_high_log));
                 
             % CLASSIFICATION 3
             % 1 (1) - 2 (0)
@@ -366,11 +366,11 @@ classdef svmClassifier < handle
 %             TREE_5_6 = fitctree(fr_avg(idx,:),double(l3_low_high_log));
 
 %             predict.model1_3456_1278 = model1;
-            predict.TREE_3456_1278 = TREE_3456_1278;
-            predict.model2_34_56 = model2_low;
-%             predict.TREE_34_56 = TREE_34_56;
-            predict.model2_12_78 = model2_high;
-%             predict.TREE_12_78 = TREE_12_78;
+            predict.LDA_3456_1278 = LDA_3456_1278;
+%             predict.model2_34_56 = model2_low;
+            predict.LDA_34_56 = LDA_34_56;
+%             predict.model2_12_78 = model2_high;
+            predict.LDA_12_78 = LDA_12_78;
             predict.model3_1_2 = model3_high_low;
 %             predict.TREE_1_2 = TREE_1_2;
             predict.model3_7_8 = model3_high_high;
@@ -392,10 +392,10 @@ classdef svmClassifier < handle
             [~,fr_avg] = obj.fr_features(testData,80,N); % preprocess EEG data
 
 %             pred_1 = obj.svmPredict(obj.model.model1_3456_1278,fr_avg(1,:));
-            pred_1 = predict(obj.model.TREE_3456_1278,fr_avg(1,:));
+            pred_1 = predict(obj.model.LDA_3456_1278,fr_avg(1,:));
             if pred_1 == 1 % left(1): 1, 2, 7, 8
-                pred_2 = obj.svmPredict(obj.model.model2_12_78, fr_avg(1,:)); % 1, 2 (1) - 7, 8 (0)
-%                 pred_2 = predict(obj.model.TREE_12_78,fr_avg(1,:));  
+%                 pred_2 = obj.svmPredict(obj.model.model2_12_78, fr_avg(1,:)); % 1, 2 (1) - 7, 8 (0)
+                pred_2 = predict(obj.model.LDA_12_78,fr_avg(1,:));  
                 if pred_2 == 1 % 1 (1) - 2 (0)
                     pred_3 = obj.svmPredict(obj.model.model3_1_2, fr_avg(1,:));
 %                     pred_3 = predict(obj.model.TREE_1_2, fr_avg(1,:));
@@ -414,8 +414,8 @@ classdef svmClassifier < handle
                     end
                 end
             elseif pred_1 == 0 % right(0): 3, 4, 5, 6 
-                pred_2 = obj.svmPredict(obj.model.model2_34_56, fr_avg(1,:)); % 3, 4 (1) - 5, 6 (0)
-%                 pred_2 = predict(obj.model.TREE_34_56,fr_avg(1,:)); 
+%                 pred_2 = obj.svmPredict(obj.model.model2_34_56, fr_avg(1,:)); % 3, 4 (1) - 5, 6 (0)
+                pred_2 = predict(obj.model.LDA_34_56,fr_avg(1,:)); 
                 if pred_2 == 1 % 3 (1) - 4 (0)
                     pred_3 = obj.svmPredict(obj.model.model3_3_4, fr_avg(1,:));
 %                     pred_3 = predict(obj.model.TREE_3_4, fr_avg(1,:));
