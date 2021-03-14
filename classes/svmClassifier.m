@@ -318,8 +318,8 @@ classdef svmClassifier < handle
             % CLASSIFICATION 1
             % right(0): 3, 4, 5, 6 - left(1): 1, 2, 7, 8
             l = or((labels<=2),(labels>=7));
-%             model1 = obj.svmTrain(fr_avg, double(l), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
-            LDA_3456_1278 = fitcdiscr(fr_avg,double(l));
+            model1 = obj.svmTrain(fr_avg, double(l), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
+%             LDA_3456_1278 = fitcdiscr(fr_avg,double(l));
             
             % CLASSIFICATION 2
             % 3, 4 (1) - 5, 6 (0)
@@ -365,8 +365,8 @@ classdef svmClassifier < handle
             model3_low_high = obj.svmTrain(fr_avg(idx,:), double(l3_low_high_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
 %             TREE_5_6 = fitctree(fr_avg(idx,:),double(l3_low_high_log));
 
-%             predict.model1_3456_1278 = model1;
-            predict.LDA_3456_1278 = LDA_3456_1278;
+            predict.model1_3456_1278 = model1;
+%             predict.LDA_3456_1278 = LDA_3456_1278;
 %             predict.model2_34_56 = model2_low;
             predict.LDA_34_56 = LDA_34_56;
 %             predict.model2_12_78 = model2_high;
@@ -391,8 +391,8 @@ classdef svmClassifier < handle
             N = length(testData.spikes);
             [~,fr_avg] = obj.fr_features(testData,80,N); % preprocess EEG data
 
-%             pred_1 = obj.svmPredict(obj.model.model1_3456_1278,fr_avg(1,:));
-            pred_1 = predict(obj.model.LDA_3456_1278,fr_avg(1,:));
+            pred_1 = obj.svmPredict(obj.model.model1_3456_1278,fr_avg(1,:));
+%             pred_1 = predict(obj.model.LDA_3456_1278,fr_avg(1,:));
             if pred_1 == 1 % left(1): 1, 2, 7, 8
 %                 pred_2 = obj.svmPredict(obj.model.model2_12_78, fr_avg(1,:)); % 1, 2 (1) - 7, 8 (0)
                 pred_2 = predict(obj.model.LDA_12_78,fr_avg(1,:));  
