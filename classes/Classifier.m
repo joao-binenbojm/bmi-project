@@ -1,6 +1,5 @@
 classdef Classifier
-    %CLASSIFIER Summary of this class goes here
-    %   Detailed explanation goes here
+    %CLASSIFIER Class of classifier classes
     
     properties
         NN
