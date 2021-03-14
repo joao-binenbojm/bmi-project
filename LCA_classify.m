@@ -1,9 +1,9 @@
 %% PLOT TEST DATA
-%load monkey
+load monkeydata_training
 x = extractfield(trial,'spikes');
 Y=repmat([1:1:8]',100,1);
 %%
-clearvars -except x Y
+clearvars -except x Y trial
 bins = [20,40,60,80];
 for epoch=1%1:100
     for bin=4%1:length(bins)
@@ -28,14 +28,14 @@ for epoch=1%1:100
         [split_X,split_labels] = split_data(fr_avg,Y,0.7);
         %MdlLinear = fitcdiscr(split_X.train,split_labels.train);
         %MdlLinear = fitctree(split_X.train,split_labels.train,'AlgorithmForCategorical','Exact');
-        %MdlLinear = fitcnb(split_X.train,split_labels.train); % fails
-        t = templateSVM('Standardize',true,'KernelFunction','gaussian');
-        MdlLinear = fitcecoc(split_X.train,split_labels.train,'Learners',t);
+        MdlLinear = fitcnb(split_X.train,split_labels.train,'DistributionNames','kernel');
+%         t = templateSVM('Standardize',true,'KernelFunction','gaussian');
+%         MdlLinear = fitcecoc(split_X.train,split_labels.train,'Learners',t);
         %MdlLinear = fitcknn(split_X.train,split_labels.train);
         %MdlLinear = fitglm(split_X.train,split_labels.train); % fails
-        [meanclass2,post_probs,cost] = predict(MdlLinear,split_X.test');
+        [meanclass2,post_probs,cost] = predict(MdlLinear,split_X.test);
         bools = meanclass2 == split_labels.test;
-        percent = sum(bools)/size(split_labels.test',1)
+        percent = sum(bools)/size(split_labels.test,1)
         %lst_percent(epoch,bin) = percent;
     end
 end

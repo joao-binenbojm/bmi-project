@@ -6,6 +6,7 @@ classdef Classifier
         NN
         LDA
         SVM
+        NB
     end
     
     methods
@@ -15,6 +16,7 @@ classdef Classifier
             obj.NN = nnClassifier();
             obj.LDA = ldaClassifier();
             obj.SVM = svmClassifier();
+            obj.NB = nbClassifier();
         end
     end
 end
