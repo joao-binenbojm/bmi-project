@@ -14,8 +14,8 @@ function  [modelParameters] = positionEstimatorTraining_classifier(trainingData)
     
     class = Classifier(); % create Classifier class
     
-    C = 100; % regularization
-    s = 0.1; % variance
+    C = 1; % regularization
+    s = 0.5; % variance
     
     C_param.LDA = class.LDA.fit(trainingData); % LDA classifier
     C_param.SVM = class.SVM.fit(trainingData,C,s); % SVM classifier
