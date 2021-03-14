@@ -28,11 +28,11 @@ for epoch=1%1:100
         [split_X,split_labels] = split_data(fr_avg,Y,0.7);
         %MdlLinear = fitcdiscr(split_X.train,split_labels.train);
         %MdlLinear = fitctree(split_X.train,split_labels.train,'AlgorithmForCategorical','Exact');
-        MdlLinear = fitcnb(split_X.train,split_labels.train,'DistributionNames','kernel');
-%         t = templateSVM('Standardize',true,'KernelFunction','gaussian');
-%         MdlLinear = fitcecoc(split_X.train,split_labels.train,'Learners',t);
+%         MdlLinear = fitcnb(split_X.train,split_labels.train,'DistributionNames','kernel');
+        t = templateSVM('Standardize',true,'KernelFunction','polynomial','KernelScale','auto');
+        MdlLinear = fitcecoc(split_X.train,split_labels.train,'Learners',t);
         %MdlLinear = fitcknn(split_X.train,split_labels.train);
-        %MdlLinear = fitglm(split_X.train,split_labels.train); % fails
+%         MdlLinear = fitglm(split_X.train,split_labels.train); % singular matrix
         [meanclass2,post_probs,cost] = predict(MdlLinear,split_X.test);
         bools = meanclass2 == split_labels.test;
         percent = sum(bools)/size(split_labels.test,1)

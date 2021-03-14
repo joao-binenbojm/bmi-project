@@ -1,5 +1,5 @@
 classdef svmClassifier < handle
-    %SVMCLASSIFIER LDA Classifier
+    %SVMCLASSIFIER SVM Classifier
     %   Support vector machine classifier
     
     properties
@@ -9,7 +9,7 @@ classdef svmClassifier < handle
     
     methods
         function obj = svmClassifier()
-            %LDACLASSIFIER Construct an instance of this class
+            %NBCLASSIFIER Construct an instance of this class
             
         end
         

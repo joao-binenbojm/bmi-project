@@ -7,6 +7,7 @@ classdef Classifier
         LDA
         SVM
         NB
+        ECOC
     end
     
     methods
@@ -17,6 +18,7 @@ classdef Classifier
             obj.LDA = ldaClassifier();
             obj.SVM = svmClassifier();
             obj.NB = nbClassifier();
+            obj.ECOC = ecocClassifier();
         end
     end
 end

@@ -1,6 +1,6 @@
 classdef nbClassifier < handle
-    %LDACLASSIFIER LDA Classifier
-    %   Linear discriminant analysis classifier
+    %NBCLASSIFIER NB Classifier
+    %   Naive Bayesian classifier
     
     properties
         model
@@ -9,7 +9,7 @@ classdef nbClassifier < handle
     
     methods
         function obj = nbClassifier()
-            %LDACLASSIFIER Construct an instance of this class
+            %NBCLASSIFIER Construct an instance of this class
             
         end
         

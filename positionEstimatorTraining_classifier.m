@@ -21,6 +21,7 @@ function  [modelParameters] = positionEstimatorTraining_classifier(trainingData)
     C_param.SVM = class.SVM.fit(trainingData,C,s); % SVM classifier
     C_param.NN = class.NN.fit(trainingData); % NN classifier
     C_param.NB = class.NB.fit(trainingData); % NB classifier
+    C_param.ECOC = class.ECOC.fit(trainingData); % ECOC classifier
     
     % PCR regressor training
     
