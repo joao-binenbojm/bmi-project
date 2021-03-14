@@ -326,53 +326,57 @@ classdef svmClassifier < handle
             l2_low_log = labels(l2_low)<5;
             idx = ~l;
             model2_low = obj.svmTrain(fr_avg(idx,:), double(l2_low_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
-
+            LDA_34_56 = fitcdiscr(fr_avg(idx,:),double(l2_low_log));
+            
             % 1, 2 (1) - 7, 8 (0)
             l2_high = labels(l);
             l2_high_log = labels(l2_high)<3;
             idx = l;
             model2_high = obj.svmTrain(fr_avg(idx,:), double(l2_high_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
-
+            LDA_12_78 = fitcdiscr(fr_avg(idx,:),double(l2_high_log));
+                
             % CLASSIFICATION 3
             % 1 (1) - 2 (0)
             l3_high_low = l2_high(l2_high_log); 
             l3_high_low_log = l2_high(l3_high_low)<2;
             idx = labels<3;
-%             model3_high_low = obj.svmTrain(fr_avg(idx,:), double(l3_high_low_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
-            TREE_1_2 = fitctree(fr_avg(idx,:),double(l3_high_low_log));
+            model3_high_low = obj.svmTrain(fr_avg(idx,:), double(l3_high_low_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
+%             TREE_1_2 = fitctree(fr_avg(idx,:),double(l3_high_low_log));
 
             % 7 (1) - 8 (0)
             l3_high_high = l2_high(~l2_high_log); 
             l3_high_high_log = l2_high(l3_high_high)<8;
             idx = labels>6;
-%             model3_high_high = obj.svmTrain(fr_avg(idx,:), double(l3_high_high_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
-            TREE_7_8 = fitctree(fr_avg(idx,:),double(l3_high_high_log));
+            model3_high_high = obj.svmTrain(fr_avg(idx,:), double(l3_high_high_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
+%             TREE_7_8 = fitctree(fr_avg(idx,:),double(l3_high_high_log));
 
             % 3 (1) - 4 (0)
             l3_low_low = l2_low(l2_low_log);
             l3_low_low_log = l3_low_low<4;
             idx = and((labels>2),(labels<5));
-%             model3_low_low = obj.svmTrain(fr_avg(idx,:), double(l3_low_low_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
-            TREE_3_4 = fitctree(fr_avg(idx,:),double(l3_low_low_log));
+            model3_low_low = obj.svmTrain(fr_avg(idx,:), double(l3_low_low_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
+%             TREE_3_4 = fitctree(fr_avg(idx,:),double(l3_low_low_log));
 
             % 5 (1) - 6 (0)
             l3_low_high = l2_low(~l2_low_log); 
             l3_low_high_log = l3_low_high<6;
             idx = and((labels>4),(labels<7));
-%             model3_low_high = obj.svmTrain(fr_avg(idx,:), double(l3_low_high_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
-            TREE_5_6 = fitctree(fr_avg(idx,:),double(l3_low_high_log));
+            model3_low_high = obj.svmTrain(fr_avg(idx,:), double(l3_low_high_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
+%             TREE_5_6 = fitctree(fr_avg(idx,:),double(l3_low_high_log));
 
             predict.model1_3456_1278 = model1;
-            predict.model2_34_56 = model2_low;
-            predict.model2_12_78 = model2_high;
-%             predict.model3_1_2 = model3_high_low;
-            predict.TREE_1_2 = TREE_1_2;
-%             predict.model3_7_8 = model3_high_high;
-            predict.TREE_7_8 = TREE_7_8;
-%             predict.model3_3_4 = model3_low_low;
-            predict.TREE_3_4 = TREE_3_4;
-%             predict.model3_5_6 = model3_low_high;
-            predict.TREE_5_6 = TREE_5_6;
+%             predict.model2_34_56 = model2_low;
+            predict.LDA_34_56 = LDA_34_56;
+%             predict.model2_12_78 = model2_high;
+            predict.LDA_12_78 = LDA_12_78;
+            predict.model3_1_2 = model3_high_low;
+%             predict.TREE_1_2 = TREE_1_2;
+            predict.model3_7_8 = model3_high_high;
+%             predict.TREE_7_8 = TREE_7_8;
+            predict.model3_3_4 = model3_low_low;
+%             predict.TREE_3_4 = TREE_3_4;
+            predict.model3_5_6 = model3_low_high;
+%             predict.TREE_5_6 = TREE_5_6;
             
             out = predict;
             obj.model = out;
@@ -387,18 +391,19 @@ classdef svmClassifier < handle
 
             pred_1 = obj.svmPredict(obj.model.model1_3456_1278,fr_avg(1,:));
             if pred_1 == 1 % left(1): 1, 2, 7, 8
-                pred_2 = obj.svmPredict(obj.model.model2_12_78, fr_avg(1,:)); % 1, 2 (1) - 7, 8 (0)
+%                 pred_2 = obj.svmPredict(obj.model.model2_12_78, fr_avg(1,:)); % 1, 2 (1) - 7, 8 (0)
+                  pred_2 = predict(obj.model.LDA_12_78,fr_avg(1,:));  
                 if pred_2 == 1 % 1 (1) - 2 (0)
-%                     pred_3 = obj.svmPredict(obj.model.model3_1_2, fr_avg(1,:));
-                    pred_3 = predict(obj.model.TREE_1_2, fr_avg(1,:));
+                    pred_3 = obj.svmPredict(obj.model.model3_1_2, fr_avg(1,:));
+%                     pred_3 = predict(obj.model.TREE_1_2, fr_avg(1,:));
                     if pred_3 == 1
                         obj.pred_angle = 1;
                     else 
                         obj.pred_angle = 2;
                     end
                 elseif pred_2 == 0 % 7 (1) - 8 (0)
-%                     pred_3 = obj.svmPredict(obj.model.model3_7_8, fr_avg(1,:));
-                    pred_3 = predict(obj.model.TREE_7_8, fr_avg(1,:));
+                    pred_3 = obj.svmPredict(obj.model.model3_7_8, fr_avg(1,:));
+%                     pred_3 = predict(obj.model.TREE_7_8, fr_avg(1,:));
                     if pred_3 == 1 
                         obj.pred_angle = 7;
                     else
@@ -406,18 +411,19 @@ classdef svmClassifier < handle
                     end
                 end
             elseif pred_1 == 0 % right(0): 3, 4, 5, 6 
-                pred_2 = obj.svmPredict(obj.model.model2_34_56, fr_avg(1,:)); % 3, 4 (1) - 5, 6 (0)
+%                 pred_2 = obj.svmPredict(obj.model.model2_34_56, fr_avg(1,:)); % 3, 4 (1) - 5, 6 (0)
+                pred_2 = predict(obj.model.LDA_34_56,fr_avg(1,:)); 
                 if pred_2 == 1 % 3 (1) - 4 (0)
-%                     pred_3 = obj.svmPredict(obj.model.model3_3_4, fr_avg(1,:));
-                    pred_3 = predict(obj.model.TREE_3_4, fr_avg(1,:));
+                    pred_3 = obj.svmPredict(obj.model.model3_3_4, fr_avg(1,:));
+%                     pred_3 = predict(obj.model.TREE_3_4, fr_avg(1,:));
                     if pred_3 == 1
                         obj.pred_angle = 3;
                     else 
                         obj.pred_angle = 4;
                     end
                 elseif pred_2 == 0 % 5 (1) - 6 (0)
-%                     pred_3 = obj.svmPredict(obj.model.model3_5_6, fr_avg(1,:)); 
-                    pred_3 = predict(obj.model.TREE_5_6, fr_avg(1,:)); 
+                    pred_3 = obj.svmPredict(obj.model.model3_5_6, fr_avg(1,:)); 
+%                     pred_3 = predict(obj.model.TREE_5_6, fr_avg(1,:)); 
                     if pred_3 == 1 
                         obj.pred_angle = 5;
                     else
