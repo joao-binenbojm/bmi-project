@@ -311,8 +311,8 @@ classdef svmClassifier < handle
             N = 560; % define end time
 
             [~,fr_avg] = obj.fr_features(trainingData,80,N); % obtaining firing rate feature space from training data
-    
-            % LDA classifier training
+            
+            % SVM classifier training
             labels=repmat([1:1:8]',T,1); % generate labels for classifier 
 
             % CLASSIFICATION 1
@@ -323,26 +323,26 @@ classdef svmClassifier < handle
             % CLASSIFICATION 2
             % 3, 4 (1) - 5, 6 (0)
             l2_low = labels(~l);
-            l2_low_log = labels(l2_low)<5;
+            l2_low_log = l2_low<5;
             idx = ~l;
             model2_low = obj.svmTrain(fr_avg(idx,:), double(l2_low_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
             
             % 1, 2 (1) - 7, 8 (0)
             l2_high = labels(l);
-            l2_high_log = labels(l2_high)<3;
+            l2_high_log = l2_high<3;
             idx = l;
             model2_high = obj.svmTrain(fr_avg(idx,:), double(l2_high_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
                 
             % CLASSIFICATION 3
             % 1 (1) - 2 (0)
             l3_high_low = l2_high(l2_high_log); 
-            l3_high_low_log = l2_high(l3_high_low)<2;
+            l3_high_low_log = l3_high_low<2;
             idx = labels<3;
             model3_high_low = obj.svmTrain(fr_avg(idx,:), double(l3_high_low_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
 
             % 7 (1) - 8 (0)
             l3_high_high = l2_high(~l2_high_log); 
-            l3_high_high_log = l2_high(l3_high_high)<8;
+            l3_high_high_log = l3_high_high<8;
             idx = labels>6;
             model3_high_high = obj.svmTrain(fr_avg(idx,:), double(l3_high_high_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
 
