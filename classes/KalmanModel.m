@@ -83,7 +83,7 @@ classdef KalmanModel
             for direc = 1:A
                 samp_count = 0;
                 for tr = 1:T
-                    for t = obj.bw+obj.delay:1:length(training_data(tr, direc).spikes)
+                    for t = obj.bw+obj.delay:20:length(training_data(tr, direc).spikes)
                         samp_count = samp_count + 1;
                         X_A{direc}(1:2, samp_count) = training_data(tr, direc).handPos(1:2, t-20)...
                             - [obj.x_avg(direc, t-20); obj.y_avg(direc, t-20)];
@@ -110,9 +110,8 @@ classdef KalmanModel
                 Y_dummy(isinf(Y_dummy)) = 0; % no spiking
                 Y_H(direc) = {Y_dummy};
                 C = cov(Y_H{direc}');
-                r = rank(C);
                 [V_eig,D] = eig(C);
-                [~,I] = maxk(abs(diag(D)),4);
+                [~,I] = maxk(abs(diag(D)), 4);
                 obj.V(direc) = {V_eig(:, I)};
                 Y_H(direc) = {(Y_H{direc}'*obj.V{direc})'}; % Projection onto PCA subspace
                 
@@ -129,7 +128,7 @@ classdef KalmanModel
                 % PCR solution for A
                 [U,S,V_eig] = svds(X_A{a}, A_npcr);
                 obj.A{a} = Y_A{a}*(V_eig/S)*U';
-                % OLS solution for H
+                % PCR solution for H
                 [U,S,V_eig] = svds(X_H{a}, H_npcr);
                 obj.H{a} = Y_H{a}*(V_eig/S)*U';
                 % Estimating covariance matrices (Wu et. al, 2002 notation)
@@ -159,7 +158,7 @@ classdef KalmanModel
             x_current = x_priori + K*(freqs - obj.H{pred_angle}*x_priori);
             P_current = (eye(size(K, 1)) - K * obj.H{pred_angle})*P_priori;
             % Update appropriate quantities
-            if L <= 792
+            if L <= length(obj.x_avg)
                 x = x_current(1) + obj.x_avg(pred_angle, L); 
                 y = x_current(2) + obj.y_avg(pred_angle, L);
             else

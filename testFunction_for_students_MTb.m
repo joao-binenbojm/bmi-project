@@ -4,12 +4,12 @@
 % the relevant modelParameters, and then calls the function
 % "positionEstimator" to decode the trajectory. 
 
-function RMSE = testFunction_for_students_MTb(teamName)
+function [RMSE, tracker] = testFunction_for_students_MTb(teamName)
 
 load monkeydata0.mat
 
 % Set random number generator
-rng(2013);
+% rng(2013);
 ix = randperm(length(trial));
 
 addpath(teamName);
@@ -43,9 +43,8 @@ for tr=1:size(testData,1)
             past_current_trial.trialId = testData(tr,direc).trialId;
             past_current_trial.spikes = testData(tr,direc).spikes(:,1:t); 
             past_current_trial.decodedHandPos = decodedHandPos;
-
-            past_current_trial.startHandPos = testData(tr,direc).handPos(1:2,1); 
             
+            past_current_trial.startHandPos = testData(tr,direc).handPos(1:2,1); 
             if nargout('positionEstimator') == 3
                 [decodedPosX, decodedPosY, newParameters] = positionEstimator(past_current_trial, modelParameters);
                 modelParameters = newParameters;
@@ -65,6 +64,9 @@ for tr=1:size(testData,1)
         plot(testData(tr,direc).handPos(1,times),testData(tr,direc).handPos(2,times),'b')
     end
 end
+
+% accuracy = sum(modelParameters.angle_tracker)/length(modelParameters.angle_tracker)
+% tracker = modelParameters.angle_tracker;
 
 legend('Decoded Position', 'Actual Position')
 

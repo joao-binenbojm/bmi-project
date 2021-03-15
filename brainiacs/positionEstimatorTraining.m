@@ -11,12 +11,14 @@ function [model] = positionEstimatorTraining(training_data)
     
   N = 560; % define end time
     
-  [~,fr_avg] = fr_features(training_data,80,N); % obtaining firing rate feature space from training data
+%   [~,fr_avg] = fr_features(training_data,80,N); % obtaining firing rate feature space from training data
     
   % LDA classifier training
     
-  Y=repmat([1:1:8]',T,1); % generate labels for classifier 
-  model.C_param.Mdl_LDA = fitcdiscr(fr_avg,Y); % LDA classifier object
+%   Y=repmat([1:1:8]',T,1); % generate labels for classifier 
+%   model.C_param.Mdl_LDA = fitcdiscr(fr_avg,Y); % LDA classifier object
+  model.C_param.nn = nnClassifier();
+  model.C_param.nn = model.C_param.nn.fit(training_data);
   
   % Kalman filter training
   

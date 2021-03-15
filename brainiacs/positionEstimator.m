@@ -50,16 +50,14 @@ function [x, y, model] = positionEstimator(test_data, model)
     
   N = length(test_data.spikes); % get trial length
     
-  if N==320 || N==400 || N==480 || N==560
+  if N==320 %|| N==400 || N==480 || N==560
       C_param = model.C_param; % extract LDA classification parameters
-      [~,fr_avg] = fr_features(test_data,80,N); % preprocess EEG data
-      pred_angle = predict(C_param.Mdl_LDA,fr_avg); % classify angle from LDA 
+      pred_angle = C_param.nn.predict(test_data); % classify angle from LDA 
       model.C_param.pred_angle = pred_angle;
   else
       pred_angle = model.C_param.pred_angle;
   end
   % Kalman filter testing
-  
   [x, y, model.K_param] = model.K_param.predict(test_data,pred_angle);
    
 end
