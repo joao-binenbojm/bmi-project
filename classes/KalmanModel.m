@@ -4,6 +4,7 @@ classdef KalmanModel
     properties
         bw
         delay
+        opt_delay
         x_avg
         y_avg
         A
@@ -21,6 +22,7 @@ classdef KalmanModel
             %KALMANMODEL Construct an instance of this class
             obj.bw = 40;
             obj.delay = 30;
+            obj.opt_delay = load("opt_delay");
         end
         
         function [x,y,x_avg,y_avg,x_vel,y_vel,x_acc,y_acc,l] = kinematics(obj,data)
