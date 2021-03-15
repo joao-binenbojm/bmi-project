@@ -69,9 +69,6 @@ function [x, y,newModelParameters] = positionEstimator(testData, modelParameters
     pred_angle = mode([pred_angle_NN pred_angle_LDA pred_angle_ECOC]);
     modelParameters.pred_angle = pred_angle;
     
-    modelParameters.percentage = modelParameters.percentage + (modelParameters.real_angle==pred_angle);
-    modelParameters.counter = modelParameters.counter + 1;
-    
     % PCR regressor testing
     
     if N>560 % set N limit to 560
