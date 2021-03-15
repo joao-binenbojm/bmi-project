@@ -33,10 +33,10 @@ function [x,y,x_avg,y_avg,x_vel,y_vel,x_acc,y_acc,l] = kinematics(data)
             var_y = data(t,a).handPos(2,:);
             x(t,a,:) = [var_x var_x(end)*ones(1,L-length(var_x))];
             y(t,a,:) = [var_y var_y(end)*ones(1,L-length(var_y))];
-            x_vel(t,a,:) = [0 diff(squeeze(x(t,a,:))')]; %calculate immediate velocity
-            y_vel(t,a,:) = [0 diff(squeeze(x(t,a,:))')];
-            x_acc(t,a,:) = [0 0 diff(diff(squeeze(x(t,a,:))'))]; %calculate immediate acceleration
-            y_acc(t,a,:) = [0 0 diff(diff(squeeze(y(t,a,:))'))];
+            x_vel(t,a,:) = [0 diff(squeeze(x(t,a,:))')/0.02]; %calculate immediate velocity
+            y_vel(t,a,:) = [0 diff(squeeze(y(t,a,:))')/0.02];
+            x_acc(t,a,:) = [0 0 diff(diff(squeeze(x(t,a,:))')/0.02)/0.02]; %calculate immediate acceleration
+            y_acc(t,a,:) = [0 0 diff(diff(squeeze(y(t,a,:))')/0.02)/0.02];
         end
         x_avg(a,:) = squeeze(mean(x(:,a,:),1))';
         y_avg(a,:) = squeeze(mean(y(:,a,:),1))';
