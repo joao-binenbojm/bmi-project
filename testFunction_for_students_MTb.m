@@ -5,7 +5,7 @@
 % "positionEstimator" to decode the trajectory. 
 
 function RMSE = testFunction_for_students_MTb(teamName)
-
+tic
 load monkeydata0.mat
 
 % Set random number generator
@@ -71,5 +71,5 @@ legend('Decoded Position', 'Actual Position')
 RMSE = sqrt(meanSqError/n_predictions) 
 
 rmpath(genpath(teamName))
-
+elapsedTime = toc(timerVal)
 end
