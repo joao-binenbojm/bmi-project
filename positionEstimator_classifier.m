@@ -19,15 +19,15 @@ function [x, y, newModelParameters] = positionEstimator_classifier(testData, mod
     C_param = modelParameters.C_param; % extract classification parameters
     
     if N==320 || N==400 || N==480 || N==560
-%         pred_angle_LDA = C_param.LDA.predict(testData); % classify angle from LDA 
+        pred_angle_LDA = C_param.LDA.predict(testData); % classify angle from LDA 
 %         pred_angle_SVM = C_param.SVM.predict(testData); % classify angle from SVM
 %         pred_angle_NB = C_param.NB.predict(testData); % classify angle from NB
-%         pred_angle_ECOC = C_param.ECOC.predict(testData); % classify angle from ECOC
+        pred_angle_ECOC = C_param.ECOC.predict(testData); % classify angle from ECOC
     else
-%         pred_angle_LDA = modelParameters.pred_angle;
+        pred_angle_LDA = modelParameters.pred_angle;
 %         pred_angle_SVM = modelParameters.pred_angle;
 %         pred_angle_NB = modelParameters.pred_angle;
-%         pred_angle_ECOC = modelParameters.pred_angle;
+        pred_angle_ECOC = modelParameters.pred_angle;
     end 
     
     if N == 320
@@ -37,8 +37,8 @@ function [x, y, newModelParameters] = positionEstimator_classifier(testData, mod
     end
     
     % majority voting
-%     pred_angle = mode([pred_angle_NN pred_angle_LDA pred_angle_ECOC]);
-      pred_angle = pred_angle_NN;
+    pred_angle = mode([pred_angle_NN pred_angle_LDA pred_angle_ECOC]);
+%     pred_angle = pred_angle_NN;
     modelParameters.pred_angle = pred_angle;
     
     if N == 320
