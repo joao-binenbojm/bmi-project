@@ -85,4 +85,3 @@ classdef nnClassifier
         end
     end
 end
-
