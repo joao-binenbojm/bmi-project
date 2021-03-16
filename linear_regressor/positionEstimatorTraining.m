@@ -1,4 +1,4 @@
-function  [modelParameters] = positionEstimatorTraining_braniacs(trainingData)
+function  [modelParameters] = positionEstimatorTraining(trainingData)
     % - trainingData:
     %     trainingData(t,a)              (t = trial id,  k = reaching angle)
     %     trainingData(t,a).trialId      unique number of the trial

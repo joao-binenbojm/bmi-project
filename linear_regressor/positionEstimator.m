@@ -1,4 +1,4 @@
-function [x, y, newModelParameters] = positionEstimator_braniacs(testData, modelParameters)
+function [x, y, newModelParameters] = positionEstimator(testData, modelParameters)
     % - test_data:
     % test_data(m).trialID
     % unique trial ID
