@@ -187,7 +187,10 @@ classdef Lin_regressor < handle
                 vx_prime_2 = obj.model(pred_angle,idx_bin).x_vel_sampled+acc_x;
                 vy_prime_2 = obj.model(pred_angle,idx_bin).y_vel_sampled+acc_y;                
                 x_prime_2 = obj.model(pred_angle,idx_bin).x_avg_sampled+vx_prime_2;
-                y_prime_2 = obj.model(pred_angle,idx_bin).y_avg_sampled+vy_prime_2;            
+                y_prime_2 = obj.model(pred_angle,idx_bin).y_avg_sampled+vy_prime_2;    
+            elseif strcmpi(opt,'avg')
+                x_pos = obj.model(pred_angle,idx_bin).x_avg_sampled;
+                y_pos = obj.model(pred_angle,idx_bin).y_avg_sampled;
             end
 
             if strcmpi(opt,'all')

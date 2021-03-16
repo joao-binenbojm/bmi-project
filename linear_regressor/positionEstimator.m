@@ -17,8 +17,15 @@ function [x, y, newModelParameters] = positionEstimator(testData, modelParameter
     
     N = length(testData.spikes); % get trial length
     
-    if N==320 || N==400 || N==480 || N==560
-        pred_angle = modelParameters.C_param.LDA.predict(testData); % classify angle from LDA 
+%     if N==320 || N==400 || N==480 || N==560
+%         pred_angle = modelParameters.C_param.LDA.predict(testData); % classify angle from LDA 
+%         modelParameters.pred_angle = pred_angle;
+%     else
+%         pred_angle = modelParameters.pred_angle;
+%     end
+
+    if N==320
+        pred_angle = modelParameters.C_param.NN.predict(testData); % classify angle from NN
         modelParameters.pred_angle = pred_angle;
     else
         pred_angle = modelParameters.pred_angle;
@@ -26,7 +33,7 @@ function [x, y, newModelParameters] = positionEstimator(testData, modelParameter
     
     % PCR regressor testing
     
-    [x,y] = modelParameters.R_param.predict(testData,pred_angle,'pos');
+    [x,y] = modelParameters.R_param.predict(testData,pred_angle,'avg');
     
     modelParameters.pred_pos = [x y];
     newModelParameters = modelParameters;

@@ -7,7 +7,8 @@ function  [modelParameters] = positionEstimatorTraining(trainingData)
     
     class = Classifier(); % create Classifier masterclass
     
-    C_param.LDA = class.LDA.fit(trainingData);
+%     C_param.LDA = class.LDA.fit(trainingData);
+    C_param.NN = class.NN.fit(trainingData);
     
     % PCR linear regressor training
     
