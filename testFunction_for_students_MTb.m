@@ -36,8 +36,10 @@ timerVal = tic;
 modelParameters = positionEstimatorTraining(trainingData);
 
 for tr=1:size(testData,1)
-    display(['Decoding block ',num2str(tr),' out of ',num2str(size(testData,1))]);
-    pause(0.001)
+    if ~opt
+        display(['Decoding block ',num2str(tr),' out of ',num2str(size(testData,1))]);
+        pause(0.001)
+    end
     for direc=randperm(8) 
         decodedHandPos = [];
 
