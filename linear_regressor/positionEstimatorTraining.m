@@ -6,17 +6,14 @@ function  [modelParameters] = positionEstimatorTraining(trainingData)
     %     trainingData(t,a).handPos(p,n) (d = dimension [1-3], t = time)
     
     [T,A] = size(trainingData); % get size of training data
+    N = 560; % define end time
     
     C_param = struct;
     R_param = struct;
-    N = 560; % define end time
     
-    [~,fr_avg] = fr_features(trainingData,80,N); % obtaining firing rate feature space from training data
+    class = Classifier(); % create Classifier masterclass
     
-    % LDA classifier training
-    
-    Y=repmat([1:1:8]',T,1); % generate labels for classifier 
-    C_param.Mdl_LDA = fitcdiscr(fr_avg,Y); % LDA classifier object
+    C_param.LDA = class.LDA.fit(trainingData);
     
     % PCR regressor training
     

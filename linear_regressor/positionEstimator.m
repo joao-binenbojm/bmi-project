@@ -17,10 +17,10 @@ function [x, y, newModelParameters] = positionEstimator(testData, modelParameter
     
     N = length(testData.spikes); % get trial length
     
+    C_param = modelParameters.C_param; % extract classification parameters
+    
     if N==320 || N==400 || N==480 || N==560
-        C_param = modelParameters.C_param; % extract LDA classification parameters
-        [~,fr_avg] = fr_features(testData,80,N); % preprocess EEG data
-        pred_angle = predict(C_param.Mdl_LDA,fr_avg); % classify angle from LDA 
+        pred_angle = C_param.LDA.predict(testData); % classify angle from LDA 
         modelParameters.pred_angle = pred_angle;
     else
         pred_angle = modelParameters.pred_angle;
