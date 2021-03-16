@@ -16,12 +16,12 @@ function [modelParameters] = positionEstimatorTraining(trainingData)
     
     class = Classifier(); % create Classifier class
     
-    C = 5; % regularization
-    s = 0.05; % variance
+%     C = 5; % regularization
+%     s = 0.05; % variance
     
-%     C_param.LDA = class.LDA.fit(trainingData); % LDA classifier
+    C_param.LDA = class.LDA.fit(trainingData); % LDA classifier
 %     C_param.SVM = class.SVM.fit(trainingData,C,s); % SVM classifier
-    C_param.NN = class.NN.fit(trainingData); % NN classifier
+%     C_param.NN = class.NN.fit(trainingData); % NN classifier
 %     C_param.NB = class.NB.fit(trainingData); % NB classifier
 %     C_param.ECOC = class.ECOC.fit(trainingData); % ECOC classifier
     
@@ -30,15 +30,17 @@ function [modelParameters] = positionEstimatorTraining(trainingData)
     dt = 20; % define time step
     N = 560; % define time limit
     range = 320:dt:N; % define relevant time steps
-    load opt_lag;
+    load('opt_lag','opt_lag');
     
     [fr_total,~] = fr_features(trainingData,20,N);
 %     fr_total = fr_total(a:8:end,u:98:end); % get spike count at relevant locations
+    
     for a = 1:8
-        fr_total = fr_total(a:8:end,1+opt_lag(:, a):end);
+        for u = 1:98
+            fr_total(a:8:end,u:98:end) = [fr_total(a:8:end,(1+opt_lag(u, a)/20)*98:98:end) zeros(T,(opt_lag(u, a)/20))];
+        end
     end
-        
-        
+          
     [x,y,x_avg,y_avg,x_vel,y_vel,x_acc,y_acc,~] = kinematics(trainingData); % calculate x and y positions padded to maximum length
     
     Trajectory.x_avg = x_avg; % store average trajectory as model parameter

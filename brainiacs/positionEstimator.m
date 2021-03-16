@@ -51,25 +51,25 @@ function [x, y,newModelParameters] = positionEstimator(testData, modelParameters
     % Classification testing
     C_param = modelParameters.C_param; % extract classification parameters
     
-%     if N==320 || N==400 || N==480 || N==560
-%         pred_angle_LDA = C_param.LDA.predict(testData); % classify angle from LDA 
+    if N==320 || N==400 || N==480 || N==560
+        pred_angle_LDA = C_param.LDA.predict(testData); % classify angle from LDA 
 %         pred_angle_SVM = C_param.SVM.predict(testData); % classify angle from SVM
 %         pred_angle_NB = C_param.NB.predict(testData); % classify angle from NB
 %         pred_angle_ECOC = C_param.ECOC.predict(testData); % classify angle from ECOC
-%     else
-%         pred_angle_LDA = modelParameters.pred_angle;
+    else
+        pred_angle_LDA = modelParameters.pred_angle;
 %         pred_angle_SVM = modelParameters.pred_angle;
 %         pred_angle_NB = modelParameters.pred_angle;
 %         pred_angle_ECOC = modelParameters.pred_angle;
-%     end 
+    end 
     
-    if N==320
-        pred_angle_NN = C_param.NN.predict(testData); % classify angle from NN
-    end
+%     if N==320
+%         pred_angle_NN = C_param.NN.predict(testData); % classify angle from NN
+%     end
     
     % majority voting
 %     pred_angle = mode([pred_angle_NN pred_angle_LDA pred_angle_ECOC]);
-    pred_angle = pred_angle_NN;
+    pred_angle = pred_angle_LDA;
     modelParameters.pred_angle = pred_angle;
     
     % PCR regressor testing
@@ -78,9 +78,15 @@ function [x, y,newModelParameters] = positionEstimator(testData, modelParameters
         N = 560;
     end
     dt = 20;
-    range = [320:dt:560];
     
     [fr_total,~] = fr_features(testData,dt,N); % preprocess EEG data
+    
+    load('opt_lag','opt_lag');
+    
+    for u = 1:98
+        fr_total(1,u:98:end) = [fr_total(1,(1+opt_lag(u, pred_angle)/20)*98:98:end) zeros(1,(opt_lag(u, pred_angle)/20))];
+    end
+    
     param = modelParameters.R_param; % get PCR regressor model parameters
     idx_bin = length(fr_total)/98-(320/dt-1);
     update_x = param(pred_angle,idx_bin).update(:,1);
