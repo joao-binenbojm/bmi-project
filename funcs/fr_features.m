@@ -5,6 +5,8 @@ function [fr_total, fr_avg, X] = fr_features(data,dt,N)
     % N - total number of samples length of
     % fr_total - spiking rate divided in bins
     % fr_avg - average spiking rate across bins
+    % X - average spiking rate across bins in different trial sections (prior to movement,
+    % peri-movement and total)
     
     [T,A] = size(data); %get trial and angle length
     
