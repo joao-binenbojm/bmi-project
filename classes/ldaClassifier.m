@@ -5,6 +5,8 @@ classdef ldaClassifier < handle
     properties
         model
         pred_angle
+        fr_norm
+        P
     end
     
     methods
@@ -50,8 +52,18 @@ classdef ldaClassifier < handle
     
             N = 560; % define end time
 
-            [~,fr_avg] = obj.fr_features(trainingData,80,N); % obtaining firing rate feature space from training data
-    
+            [~,fr_avg] = fr_features(trainingData,80,N); % obtaining firing rate feature space from training data
+            obj.fr_norm.mean = mean(fr_avg,1);
+            obj.fr_norm.std = std(fr_avg,1);
+            fr_avg = (fr_avg-obj.fr_norm.mean)./obj.fr_norm.std;
+            fr_avg(isnan(fr_avg)) = 0;
+            fr_avg(isinf(fr_avg)) = 0;
+            C = cov(fr_avg);
+            [V,D] = eig(C);
+            [~,I] = maxk(abs(diag(D)),10);
+            obj.P = V(:,I);
+            fr_avg = fr_avg*obj.P;
+            
             % LDA classifier training
             Y=repmat([1:1:8]',T,1); % generate labels for classifier 
             obj.model = fitcdiscr(fr_avg,Y); % LDA classifier object
@@ -62,7 +74,9 @@ classdef ldaClassifier < handle
             %test data
             
             N = length(testData.spikes);
-            [~,fr_avg] = obj.fr_features(testData,80,N); % preprocess EEG data
+            [~,fr_avg] = fr_features(testData,80,N); % preprocess EEG data
+            fr_avg = (fr_avg-obj.fr_norm.mean)./obj.fr_norm.std;
+            fr_avg = fr_avg*obj.P;
             out = predict(obj.model,fr_avg); % classify angle from LDA
             obj.pred_angle = out;
         end

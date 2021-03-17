@@ -11,7 +11,7 @@ addpath('funcs','data');
 load monkeydata0.mat
 
 % Set random number generator
-rng(2013);
+% rng(2013);
 ix = randperm(length(trial));
 
 % Select training and testing data (you can choose to split your data in a different way if you wish)
