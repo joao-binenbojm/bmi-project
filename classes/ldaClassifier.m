@@ -15,6 +15,20 @@ classdef ldaClassifier < handle
             
         end
         
+        function [obj] = pca(obj,x,p)
+            %PCA Calculates the principal components 
+            % x - preprocessed firing rate in bins
+            % p - number of components
+            % P - principal components matrix
+
+            x(isnan(x)) = 0;
+            x(isinf(x)) = 0;
+            C = cov(x);
+            [V,D] = eig(C);
+            [~,I] = maxk(abs(diag(D)),p);
+            obj.P = V(:,I);
+        end
+        
         function [fr_total, fr_avg, obj] = fr_features(obj,data,dt,N)
             %FR_FEATURES Calculates the firing rate of the data in bins of size dt.
             % data - given data struct
@@ -52,21 +66,16 @@ classdef ldaClassifier < handle
     
             N = 560; % define end time
 
-            [~,fr_avg] = fr_features(trainingData,80,N); % obtaining firing rate feature space from training data
-            obj.fr_norm.mean = mean(fr_avg,1);
-            obj.fr_norm.std = std(fr_avg,1);
-            fr_avg = (fr_avg-obj.fr_norm.mean)./obj.fr_norm.std;
-            fr_avg(isnan(fr_avg)) = 0;
-            fr_avg(isinf(fr_avg)) = 0;
-            C = cov(fr_avg);
-            [V,D] = eig(C);
-            [~,I] = maxk(abs(diag(D)),10);
-            obj.P = V(:,I);
-            fr_avg = fr_avg*obj.P;
+            [~,~,X] = fr_features(trainingData,80,N); % obtaining firing rate feature space from training data
+            obj.fr_norm.mean = mean(X,1);
+            obj.fr_norm.std = std(X,1);
+            X = (X-obj.fr_norm.mean)./obj.fr_norm.std;
+            obj.pca(X,10);
+            X = X*obj.P;
             
             % LDA classifier training
             Y=repmat([1:1:8]',T,1); % generate labels for classifier 
-            obj.model = fitcdiscr(fr_avg,Y); % LDA classifier object
+            obj.model = fitcdiscr(X,Y); % LDA classifier object
         end
         
         function [out,obj] = predict(obj,testData)
@@ -74,10 +83,10 @@ classdef ldaClassifier < handle
             %test data
             
             N = length(testData.spikes);
-            [~,fr_avg] = fr_features(testData,80,N); % preprocess EEG data
-            fr_avg = (fr_avg-obj.fr_norm.mean)./obj.fr_norm.std;
-            fr_avg = fr_avg*obj.P;
-            out = predict(obj.model,fr_avg); % classify angle from LDA
+            [~,~,X] = fr_features(testData,80,N); % preprocess EEG data
+            X = (X-obj.fr_norm.mean)./obj.fr_norm.std;
+            X = X*obj.P;
+            out = predict(obj.model,X); % classify angle from LDA
             obj.pred_angle = out;
         end
     end
