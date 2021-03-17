@@ -20,9 +20,7 @@ classdef ldaClassifier < handle
             % x - preprocessed firing rate in bins
             % p - number of components
             % P - principal components matrix
-
-            x(isnan(x)) = 0;
-            x(isinf(x)) = 0;
+            
             C = cov(x);
             [V,D] = eig(C);
             [~,I] = maxk(abs(diag(D)),p);
@@ -70,6 +68,8 @@ classdef ldaClassifier < handle
             obj.fr_norm.mean = mean(X,1);
             obj.fr_norm.std = std(X,1);
             X = (X-obj.fr_norm.mean)./obj.fr_norm.std;
+            X(isnan(X)) = 0;
+            X(isinf(X)) = 0;
             obj.pca(X,10);
             X = X*obj.P;
             
@@ -85,6 +85,8 @@ classdef ldaClassifier < handle
             N = length(testData.spikes);
             [~,~,X] = fr_features(testData,80,N); % preprocess EEG data
             X = (X-obj.fr_norm.mean)./obj.fr_norm.std;
+            X(isnan(X)) = 0;
+            X(isinf(X)) = 0;
             X = X*obj.P;
             out = predict(obj.model,X); % classify angle from LDA
             obj.pred_angle = out;
