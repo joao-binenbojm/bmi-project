@@ -7,7 +7,6 @@ function [rmse,delays,bw] = grid_search(bw)
     % length([20:5:90])
     % Progress bar
     f = waitbar(0, 'Processing...');
-    delays = [30:10:150];
 
     p_count = 0;
     for delay = delays
