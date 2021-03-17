@@ -1,5 +1,5 @@
 function [rmse,delays,bw] = grid_search(bw)
-    % finding optimal bin width and delay combinations
+    % finding optimal bin width and delay combinations for kalman filter
     delays = [30:10:150];
     L = length(delays);
     rmse = zeros(50, L);
