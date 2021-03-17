@@ -4,7 +4,7 @@
 % the relevant modelParameters, and then calls the function
 % "positionEstimator" to decode the trajectory. 
 
-function [RMSE,elapsedTime] = testFunction_for_students_MTb(teamName, bw, delay)
+function [RMSE,elapsedTime] = testFunction_for_students_MTb(teamName)
 
 load monkeydata0.mat
 
@@ -30,7 +30,7 @@ n_predictions = 0;
 
 % Train Model
 timerVal = tic;
-modelParameters = positionEstimatorTraining(trainingData, bw, delay);
+modelParameters = positionEstimatorTraining(trainingData);
 
 for tr=1:size(testData,1)
 %     display(['Decoding block ',num2str(tr),' out of ',num2str(size(testData,1))]);

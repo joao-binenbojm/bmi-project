@@ -1,4 +1,4 @@
-function [model] = positionEstimatorTraining(training_data, bw, delay)
+function [model] = positionEstimatorTraining(training_data)
   % Arguments:
   
   % - training_data:
@@ -6,7 +6,7 @@ function [model] = positionEstimatorTraining(training_data, bw, delay)
   %     training_data(n,k).trialId      unique number of the trial
   %     training_data(n,k).spikes(i,t)  (i = neuron id, t = time)
   %     training_data(n,k).handPos(d,t) (d = dimension [1-3], t = time)
-  model = KalmanModel(bw, delay);
+  model = KalmanModel();
   model = model.fit(training_data);
   
   % Return Value:
