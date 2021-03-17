@@ -49,7 +49,7 @@ function [x, y,newModelParameters] = positionEstimator(testData, modelParameters
   N = length(testData.spikes); % get trial length
     
     % Classification testing
-    C_param = modelParameters.C_param; % extract classification parameters
+%     C_param = modelParameters.C_param; % extract classification parameters
     
 %     if N==320 || N==400 || N==480 || N==560
 %         pred_angle_LDA = C_param.LDA.predict(testData); % classify angle from LDA 
@@ -63,20 +63,19 @@ function [x, y,newModelParameters] = positionEstimator(testData, modelParameters
 %         pred_angle_ECOC = modelParameters.pred_angle;
 %     end 
     
-    if N==320
-        pred_angle_NN = C_param.NN.predict(testData); % classify angle from NN
-    end
+%     if N==320
+%         modelParameters.pred_angle = C_param.NN.predict(testData); % classify angle from NN
+%     end
     
     % majority voting
 %     pred_angle = mode([pred_angle_NN pred_angle_LDA pred_angle_ECOC]);
-    pred_angle = pred_angle_NN;
-    modelParameters.pred_angle = pred_angle;
+%     pred_angle = modelParameters.pred_angle;
+    pred_angle = testData.angle;
     
     % Kalman model testing
     R_param = modelParameters.R_param;
     [x, y, R_param.model] = R_param.model.predict(testData, pred_angle);
-    
-    modelParameters.pred_pos = [x y];
+    modelParameters.R_param = R_param;
     newModelParameters = modelParameters;
    
 end

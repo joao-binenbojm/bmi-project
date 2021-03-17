@@ -1,4 +1,4 @@
-classdef KalmanModel
+classdef vKalmanModel
     %KALMANMODEL Model that accounts for learning matrices A and H
     
     properties
@@ -7,6 +7,8 @@ classdef KalmanModel
         opt_delay
         x_avg
         y_avg
+        x_vel_avg
+        y_vel_avg
         A
         H
         Q
@@ -18,13 +20,13 @@ classdef KalmanModel
     end
     
     methods
-        function obj = KalmanModel(bw, delay)
+        function obj = vKalmanModel()
             %KALMANMODEL Construct an instance of this class
-            obj.bw = bw;
-            obj.delay = delay;
+            obj.bw = 40;
+            obj.delay = 30;
         end
         
-        function [x,y,x_avg,y_avg,x_vel,y_vel,x_acc,y_acc,l] = kinematics(obj,data)
+        function [x,y,x_avg,y_avg,x_vel_avg,y_vel_avg,x_acc,y_acc,l] = kinematics(obj,data)
             % KINEMATICS Calculates multiple kinematic variables
             % data - given struct array
             % x - x position extended to maximum length (assuming stationarity) 
@@ -47,6 +49,8 @@ classdef KalmanModel
             [T,A] = size(data); % get dimensions of data
             x_avg = zeros(A,L); % initialise variables
             y_avg = zeros(A,L);
+            x_vel_avg = zeros(A,L);
+            y_vel_avg = zeros(A,L);
             x = zeros(T,A,L);
             y = zeros(T,A,L);
             x_vel = zeros(T,A,L);
@@ -66,6 +70,8 @@ classdef KalmanModel
                 end
                 x_avg(a,:) = squeeze(mean(x(:,a,:),1))';
                 y_avg(a,:) = squeeze(mean(y(:,a,:),1))';
+                x_vel_avg(a,:) = squeeze(mean(x_vel(:,a,:),1))';
+                y_vel_avg(a,:) = squeeze(mean(y_vel(:,a,:),1))';
             end
 
         end
@@ -75,7 +81,7 @@ classdef KalmanModel
             % format for supervised learning
 
             [T,A] = size(training_data); % get data size
-            [~,~,obj.x_avg,obj.y_avg,~,~,~,~,~] = kinematics(training_data);
+            [~,~,obj.x_avg,obj.y_avg,obj.x_vel_avg,obj.y_vel_avg,~,~,~] = obj.kinematics(training_data);
             X_A(1:A) = {zeros(4, 1e5)}; % initialise variables
             Y_A(1:A) = {zeros(4, 1e5)};
             Y_H(1:A) = {zeros(98, 1e5)};
@@ -89,11 +95,13 @@ classdef KalmanModel
                         X_A{direc}(1:2, samp_count) = training_data(tr, direc).handPos(1:2, t-20)...
                             - [obj.x_avg(direc, t-20); obj.y_avg(direc, t-20)];
                         X_A{direc}(3:4, samp_count) = (training_data(tr, direc).handPos(1:2, t-20)...
-                            - training_data(tr, direc).handPos(1:2, t-40))/0.02;
+                            - training_data(tr, direc).handPos(1:2, t-40))/0.02 ...
+                            - [obj.x_vel_avg(A, t-20); obj.y_vel_avg(A, t-20)];
                         Y_A{direc}(1:2, samp_count) = training_data(tr, direc).handPos(1:2, t)...
                              - [obj.x_avg(direc, t); obj.y_avg(direc, t)];
                         Y_A{direc}(3:4, samp_count) = (training_data(tr, direc).handPos(1:2, t)...
-                            - training_data(tr, direc).handPos(1:2, t-20))/0.02;
+                            - training_data(tr, direc).handPos(1:2, t-20))/0.02 ...
+                            - [obj.x_vel_avg(A, t); obj.y_vel_avg(A, t)];
                         Y_H{direc}(:, samp_count) = mean(training_data(tr, direc).spikes(:, t-obj.bw-obj.delay+1:t-obj.delay), 2);
                     end
                 end

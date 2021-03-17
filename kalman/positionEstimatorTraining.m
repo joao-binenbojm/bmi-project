@@ -1,4 +1,4 @@
-function [modelParameters] = positionEstimatorTraining(trainingData)
+function [modelParameters] = positionEstimatorTraining(trainingData, bw, delay)
     % Arguments:
 
     % - training_data:
@@ -21,14 +21,14 @@ function [modelParameters] = positionEstimatorTraining(trainingData)
     
 %     C_param.LDA = class.LDA.fit(trainingData); % LDA classifier
 %     C_param.SVM = class.SVM.fit(trainingData,C,s); % SVM classifier
-    C_param.NN = class.NN.fit(trainingData); % NN classifier
+%     C_param.NN = class.NN.fit(trainingData); % NN classifier
 %     C_param.NB = class.NB.fit(trainingData); % NB classifier
 %     C_param.ECOC = class.ECOC.fit(trainingData); % ECOC classifier
     
-    R_param.model = KalmanModel();
-    R_param.model = R_param.model.fit(trainingData)
+    R_param.model = KalmanModel(bw, delay);
+    R_param.model = R_param.model.fit(trainingData);
  
-    modelParameters.C_param = C_param;
+%     modelParameters.C_param = C_param;
     modelParameters.R_param = R_param;
     modelParameters.pred_angle = [];
   
