@@ -1,4 +1,4 @@
-function  [modelParameters] = positionEstimatorTraining_classifier(trainingData)
+function  [modelParameters] = positionEstimatorTraining(trainingData)
     % - trainingData:
     %     trainingData(t,a)              (t = trial id,  k = reaching angle)
     %     trainingData(t,a).trialId      unique number of the trial
@@ -14,14 +14,14 @@ function  [modelParameters] = positionEstimatorTraining_classifier(trainingData)
     
     class = Classifier(); % create Classifier class
     
-    C = 5; % regularization
-    s = 0.05; % variance
+%     C = 5; % regularization
+%     s = 0.05; % variance
     
     C_param.LDA = class.LDA.fit(trainingData); % LDA classifier
-    C_param.SVM = class.SVM.fit(trainingData,C,s); % SVM classifier
-    C_param.NN = class.NN.fit(trainingData); % NN classifier
-    C_param.NB = class.NB.fit(trainingData); % NB classifier
-    C_param.ECOC = class.ECOC.fit(trainingData); % ECOC classifier
+%     C_param.SVM = class.SVM.fit(trainingData,C,s); % SVM classifier
+%     C_param.NN = class.NN.fit(trainingData); % NN classifier
+%     C_param.NB = class.NB.fit(trainingData); % NB classifier
+%     C_param.ECOC = class.ECOC.fit(trainingData); % ECOC classifier
     
     % PCR regressor training
     
@@ -32,8 +32,6 @@ function  [modelParameters] = positionEstimatorTraining_classifier(trainingData)
     [fr_total,~] = fr_features(trainingData,20,N);
     [x,y,x_avg,y_avg,x_vel,y_vel,x_acc,y_acc,~] = kinematics(trainingData); % calculate x and y positions padded to maximum length
     
-    Trajectory.x_avg = x_avg; % store average trajectory as model parameter
-    Trajectory.y_avg = y_avg;
     x_std = squeeze(std(x,1)); % calculate standard deviation from the mean trajectory across trials for all angles
     y_std = squeeze(std(y,1));
     
@@ -82,7 +80,6 @@ function  [modelParameters] = positionEstimatorTraining_classifier(trainingData)
     end
     
     modelParameters.C_param = C_param;
-    modelParameters.Trajectory = Trajectory;
     modelParameters.R_param = R_param;
     modelParameters.pred_angle = [];
     

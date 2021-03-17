@@ -1,4 +1,4 @@
-function [x, y, newModelParameters] = positionEstimator_classifier(testData, modelParameters)
+function [x, y, newModelParameters] = positionEstimator(testData, modelParameters)
     % - test_data:
     % test_data(m).trialID
     % unique trial ID
@@ -39,12 +39,11 @@ function [x, y, newModelParameters] = positionEstimator_classifier(testData, mod
     % majority voting
 %     pred_angle = mode([pred_angle_NN pred_angle_LDA pred_angle_ECOC]);
     pred_angle = pred_angle_LDA;
-%     pred_angle = modelParameters.real_angle;
     modelParameters.pred_angle = pred_angle;
     
-    if N == 320
+    if N == 560
         modelParameters.percentage = modelParameters.percentage + (modelParameters.real_angle==pred_angle);
-        modelParameters.counter = modelParameters.counter + 1;
+        modelParameters.count = modelParameters.count + 1;
     end
     
     % PCR regressor testing
