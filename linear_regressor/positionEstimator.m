@@ -17,15 +17,15 @@ function [x, y, newModelParameters] = positionEstimator(testData, modelParameter
     
     N = length(testData.spikes); % get trial length
     
-%     if N==320 || N==400 || N==480 || N==560
-%         pred_angle = modelParameters.C_param.LDA.predict(testData); % classify angle from LDA 
+    if N==320 || N==400 || N==480 || N==560
+        pred_angle = modelParameters.C_param.LDA.predict(testData); % classify angle from LDA 
 %         pred_angle = modelParameters.C_param.SVM.predict(testData); % classify angle from SVM
 %         pred_angle = modelParameters.C_param.ECOC.predict(testData); % classify angle from ECOC
 %         pred_angle = modelParameters.C_param.NB.predict(testData); % classify angle from NB
-%         modelParameters.pred_angle = pred_angle;
-%     else
-%         pred_angle = modelParameters.pred_angle;
-%     end
+        modelParameters.pred_angle = pred_angle;
+    else
+        pred_angle = modelParameters.pred_angle;
+    end
 
 %     if N==320
 %         pred_angle = modelParameters.C_param.NN.predict(testData); % classify angle from NN
@@ -33,7 +33,7 @@ function [x, y, newModelParameters] = positionEstimator(testData, modelParameter
 %     else
 %         pred_angle = modelParameters.pred_angle;
 %     end
-    pred_angle = modelParameters.real_angle;
+
     if N==560
         modelParameters.percentage = modelParameters.percentage+double(pred_angle==modelParameters.real_angle);
         modelParameters.count = modelParameters.count+1;
