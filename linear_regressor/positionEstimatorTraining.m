@@ -8,7 +8,10 @@ function  [modelParameters] = positionEstimatorTraining(trainingData)
     class = Classifier(); % create Classifier masterclass
     
 %     C_param.LDA = class.LDA.fit(trainingData);
-    C_param.NN = class.NN.fit(trainingData);
+%     C_param.SVM = class.SVM.fit(trainingData,5,0.05);
+%     C_param.ECOC = class.ECOC.fit(trainingData);
+%     C_param.NB = class.NB.fit(trainingData);
+%     C_param.NN = class.NN.fit(trainingData);
     
     % PCR linear regressor training
     
@@ -16,8 +19,8 @@ function  [modelParameters] = positionEstimatorTraining(trainingData)
     
     R_param = lin.fit(trainingData);
     
-    modelParameters.C_param = C_param;
+%     modelParameters.C_param = C_param;
     modelParameters.R_param = R_param;
-    modelParameters.pred_angle = [];
+%     modelParameters.pred_angle = [];
     
 end
