@@ -5,13 +5,13 @@ function  [modelParameters] = positionEstimatorTraining(trainingData)
     %     trainingData(t,a).spikes(u,n)  (i = neuron id, t = time)
     %     trainingData(t,a).handPos(p,n) (d = dimension [1-3], t = time)
     
-    class = Classifier(); % create Classifier masterclass
-    
-    C_param.LDA = class.LDA.fit(trainingData);
-%     C_param.SVM = class.SVM.fit(trainingData,5,0.05);
-%     C_param.ECOC = class.ECOC.fit(trainingData);
-%     C_param.NB = class.NB.fit(trainingData);
-%     C_param.NN = class.NN.fit(trainingData);
+    % Classification training
+    C_param.LDA1 =  ldaClassifier(1);
+    C_param.LDA1 = C_param.LDA1.fit(trainingData);
+    C_param.LDA2 = ldaClassifier(2);
+    C_param.LDA2 = C_param.LDA2.fit(trainingData);
+    C_param.LDA3 = ldaClassifier(3);
+    C_param.LDA3 = C_param.LDA3.fit(trainingData);
     
     % PCR linear regressor training
     
