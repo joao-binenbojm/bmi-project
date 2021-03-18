@@ -4,7 +4,7 @@ classdef KalmanModel
     properties
         bw
         delay
-        opt_delay
+        p
         x_avg
         y_avg
         A
@@ -18,10 +18,11 @@ classdef KalmanModel
     end
     
     methods
-        function obj = KalmanModel()
+        function obj = KalmanModel(p)
             %KALMANMODEL Construct an instance of this class
             obj.bw = 20;
             obj.delay = 50;
+            obj.p = p;
         end
         
         function [x,y,x_avg,y_avg,x_vel,y_vel,x_acc,y_acc,l] = kinematics(obj,data)
@@ -94,7 +95,7 @@ classdef KalmanModel
                              - [obj.x_avg(direc, t); obj.y_avg(direc, t)];
                         Y_A{direc}(3:4, samp_count) = (training_data(tr, direc).handPos(1:2, t)...
                             - training_data(tr, direc).handPos(1:2, t-20))/0.02;
-                        Y_H{direc}(:, samp_count) = mean(training_data(tr, direc).spikes(:, t-obj.bw-obj.delay+1:t-obj.delay), 2);
+                        Y_H{direc}(:, samp_count) = mean(training_data(tr,direc).spikes(:, t-obj.bw-obj.delay+1:t-obj.delay), 2);
                     end
                 end
                 X_A(direc) = {X_A{direc}(:, 1:samp_count)}; % remove extra zero elements
@@ -112,26 +113,21 @@ classdef KalmanModel
                 Y_H(direc) = {Y_dummy};
                 C = cov(Y_H{direc}');
                 [V_eig,D] = eig(C);
-                [~,I] = maxk(abs(diag(D)), 4);
+                [~,I] = maxk(abs(diag(D)), obj.p);
                 obj.V(direc) = {V_eig(:, I)};
-                Y_H(direc) = {(Y_H{direc}'*obj.V{direc})'}; % Projection onto PCA subspace
-                
+                Y_H(direc) = {(Y_H{direc}'*obj.V{direc})'}; % Projection onto PCA subspace    
             end
-         
         end
-   
         function obj = fit(obj,training_data)
             %FIT(training_data) learning the A and H matrices based on
             %training data using PCR
             
             [X_A, Y_A, X_H, Y_H, obj] = obj.extract_supervised(training_data);
             for a = 1:length(X_A) 
-                % PCR solution for A
-                [U,S,V_eig] = svds(X_A{a}, 5);
-                obj.A{a} = Y_A{a}*(V_eig/S)*U';
-                % PCR solution for H
-                [U,S,V_eig] = svds(X_H{a}, 5);
-                obj.H{a} = Y_H{a}*(V_eig/S)*U';
+                % OLS solution for A
+                obj.A{a} = Y_A{a}*X_A{a}'/(X_A{a}*X_A{a}'); 
+                % OLS solution for H
+                obj.H{a} = Y_H{a}*X_H{a}'/(X_H{a}*X_H{a}'); 
                 % Estimating covariance matrices (Wu et. al, 2002 notation)
                 obj.W{a} = (Y_A{a} - obj.A{a}*X_A{a})*(Y_A{a} - obj.A{a}*X_A{a})'/(length(Y_A{a}));
                 obj.Q{a} = (Y_H{a} - obj.H{a}*X_H{a})*(Y_H{a} - obj.H{a}*X_H{a})'/(length(Y_H{a}));
