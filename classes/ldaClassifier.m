@@ -57,7 +57,7 @@ classdef ldaClassifier < handle
                         fr(u,:) = count/dt;
                         count1 = sum(var(1:200)); % count spikes in every dt bin until 200
                         fr1(u,:) = count1/200;
-                        count2 = sum(var(250:320)); % count spikes in every dt bin from  250 to 320
+                        count2 = sum(var(200:320)); % count spikes in every dt bin from  250 to 320
                         fr2(u,:) = count2/120;
                     end
                     fr_avg(acc,:) = mean(fr,2); % get mean firing rate across bins
