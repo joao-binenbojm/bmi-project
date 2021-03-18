@@ -3,15 +3,11 @@
 RMSE = zeros(1,50);
 t = zeros(1,50);
 percentage = zeros(1,50);
-dt = [10 20 40 80];
 f = waitbar(0,'Processing...');
-for p = 1:length(dt)
-    for itr = 1:50
-        param.dt = dt(p);
-        [RMSE(p,itr),t(p,itr),modelParameters] = testFunction_for_students_MTb('classifier',true,param);
-        percentage(p,itr) = modelParameters.percentage/modelParameters.count;
-        waitbar(itr/50,f,'Processing...');
-    end
+for itr = 1:50
+    [RMSE(itr),t(itr),modelParameters] = testFunction_for_students_MTb('classifier',true);
+    percentage(itr) = modelParameters.percentage/modelParameters.count;
+    waitbar(itr/50,f,'Processing...');
 end
 close(f);
 beep;

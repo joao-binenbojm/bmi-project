@@ -1,4 +1,4 @@
-function  [modelParameters] = positionEstimatorTraining(trainingData,param)
+function  [modelParameters] = positionEstimatorTraining(trainingData)
     % - trainingData:
     %     trainingData(t,a)              (t = trial id,  k = reaching angle)
     %     trainingData(t,a).trialId      unique number of the trial
@@ -17,7 +17,7 @@ function  [modelParameters] = positionEstimatorTraining(trainingData,param)
 %     C = 5; % regularization
 %     s = 0.05; % variance
     
-    C_param.LDA = class.LDA.fit(trainingData,param.dt); % LDA classifier
+    C_param.LDA = class.LDA.fit(trainingData); % LDA classifier
 %     C_param.SVM = class.SVM.fit(trainingData,C,s); % SVM classifier
 %     C_param.NN = class.NN.fit(trainingData); % NN classifier
 %     C_param.NB = class.NB.fit(trainingData); % NB classifier

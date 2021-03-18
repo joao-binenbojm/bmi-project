@@ -1,4 +1,4 @@
-function [x, y, newModelParameters] = positionEstimator(testData, modelParameters,param)
+function [x, y, newModelParameters] = positionEstimator(testData, modelParameters)
     % - test_data:
     % test_data(m).trialID
     % unique trial ID
@@ -19,7 +19,7 @@ function [x, y, newModelParameters] = positionEstimator(testData, modelParameter
     C_param = modelParameters.C_param; % extract classification parameters
     
     if N==320 || N==400 || N==480 || N==560
-        pred_angle_LDA = C_param.LDA.predict(testData,param.dt); % classify angle from LDA 
+        pred_angle_LDA = C_param.LDA.predict(testData); % classify angle from LDA 
 %         pred_angle_SVM = C_param.SVM.predict(testData); % classify angle from SVM
 %         pred_angle_NB = C_param.NB.predict(testData); % classify angle from NB
 %         pred_angle_ECOC = C_param.ECOC.predict(testData); % classify angle from ECOC
@@ -52,7 +52,6 @@ function [x, y, newModelParameters] = positionEstimator(testData, modelParameter
         N = 560;
     end
     dt = 20;
-    range = [320:dt:560];
     
 %     [fr_total,~] = fr_features(testData,dt,N); % preprocess EEG data
     param = modelParameters.R_param; % get PCR regressor model parameters
