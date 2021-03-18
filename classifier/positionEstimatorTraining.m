@@ -11,73 +11,18 @@ function  [modelParameters] = positionEstimatorTraining(trainingData)
     R_param = struct;
     
     % Classification training
-    
-    class = Classifier(); % create Classifier class
-    
-%     C = 5; % regularization
-%     s = 0.05; % variance
-    
-    C_param.LDA = class.LDA.fit(trainingData); % LDA classifier
-%     C_param.SVM = class.SVM.fit(trainingData,C,s); % SVM classifier
-%     C_param.NN = class.NN.fit(trainingData); % NN classifier
-%     C_param.NB = class.NB.fit(trainingData); % NB classifier
-%     C_param.ECOC = class.ECOC.fit(trainingData); % ECOC classifier
+    C_param.LDA1 =  ldaClassifier(1);
+    C_param.LDA1 = C_param.LDA1.fit(trainingData);
+    C_param.LDA2 = ldaClassifier(2);
+    C_param.LDA2 = C_param.LDA2.fit(trainingData);
+    C_param.LDA3 = ldaClassifier(3);
+    C_param.LDA3 = C_param.LDA3.fit(trainingData);
     
     % PCR regressor training
+    [x_avg,y_avg] = kinematics(trainingData);
     
-    dt = 20; % define time step
-    N = 560; % define time limit
-    range = 320:dt:N; % define relevant time steps
-    
-    [fr_total,~] = fr_features(trainingData,20,N);
-    [x,y,x_avg,y_avg,x_vel,y_vel,x_acc,y_acc,~] = kinematics(trainingData); % calculate x and y positions padded to maximum length
-    
-    x_std = squeeze(std(x,1)); % calculate standard deviation from the mean trajectory across trials for all angles
-    y_std = squeeze(std(y,1));
-    
-    x_detrended = zeros(T,A,size(x,3));
-    y_detrended = zeros(T,A,size(x,3));
-    for t = 1:T % Subtract position from mean position
-        x_detrended(t,:,:) = squeeze(x(t,:,:))-x_avg;
-        y_detrended(t,:,:) = squeeze(y(t,:,:))-y_avg;
-    end
-    
-    x_detrended_sampled = x_detrended(:,:,range); % sample detrended data at relevant locations
-    y_detrended_sampled = y_detrended(:,:,range);
-    
-    for a = 1:A
-        for bin = 1:length(range)
-            R_param(a,bin).x_avg_sampled = x_avg(a,range(bin)); % store mean positions at relevant locations
-            R_param(a,bin).y_avg_sampled = y_avg(a,range(bin));
-            R_param(a,bin).x_std_sampled = x_std(a,range(bin)); % store standard deviation of positions at relevant locations
-            R_param(a,bin).y_std_sampled = y_std(a,range(bin));
-            R_param(a,bin).x_vel_sampled = squeeze(mean(x_vel(:,a,range(bin)),1)); % store mean velocity at relevant locations
-            R_param(a,bin).y_vel_sampled = squeeze(mean(y_vel(:,a,range(bin)),1));
-            R_param(a,bin).x_acc_sampled = squeeze(mean(x_acc(:,a,range(bin)),1)); % store mean acceleration at relevant locations
-            R_param(a,bin).y_acc_sampled = squeeze(mean(y_acc(:,a,range(bin)),1));
-    
-            idx_angle = (a-1)*T+1; % angle range index (for each a)
-            bin_idx = (range(bin)/dt); % bin range index (for each bin)
-            fr_bin = fr_total(idx_angle:idx_angle+T-1,1:98*bin_idx);
-            bin_x = squeeze(x_detrended_sampled(:,a,bin));
-            bin_y = squeeze(y_detrended_sampled(:,a,bin));
-            bin_x_vel = squeeze(x_vel(:,a,bin)-squeeze(mean(x_vel(:,a,range(bin)),1))); % add detrended velocity
-            bin_y_vel = squeeze(y_vel(:,a,bin)-squeeze(mean(y_vel(:,a,range(bin)),1)));
-            bin_x_acc = squeeze(x_acc(:,a,bin)-squeeze(mean(x_acc(:,a,range(bin)),1))); % add detrended acceleration
-            bin_y_acc = squeeze(y_acc(:,a,bin)-squeeze(mean(y_acc(:,a,range(bin)),1)));
-            kin = [bin_x bin_y bin_x_vel bin_y_vel bin_x_acc bin_y_acc];
-            
-            fr_bin_avg = mean(fr_bin,1);
-            R_param(a,bin).fr_bin_avg=fr_bin_avg; % store trial average firing rate per bin
-            
-            % Use PCA to extract principle components
-            p = T-1;
-            P = PCA(fr_bin,fr_bin_avg,p);
-            W = P'*(fr_bin'-fr_bin_avg');
-            update=P*(W*W')^(-1)*W*kin; % calculate linear regression
-            R_param(a,bin).update = update;
-        end
-    end
+    R_param.x_avg_sampled = x_avg(:,320:20:560);
+    R_param.y_avg_sampled = y_avg(:,320:20:560);
     
     modelParameters.C_param = C_param;
     modelParameters.R_param = R_param;
