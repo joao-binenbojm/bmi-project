@@ -17,7 +17,7 @@ function  [modelParameters] = positionEstimatorTraining(trainingData)
     C_param.LDA3 = C_param.LDA3.fit(trainingData);
     
     % PCR regressor training
-    [x_avg,y_avg] = kinematics(trainingData);
+    [x_avg,y_avg] = trajectory(trainingData);
 
     R_param.x_avg_sampled = x_avg(:,320:20:560);
     R_param.y_avg_sampled = y_avg(:,320:20:560);

@@ -53,6 +53,7 @@ classdef ldaClassifier < handle
             end
             for t=1:1:T
                 for a=1:1:A
+                    acc = acc+1;
                     fr_avg(acc,:) = mean(data(t,a).spikes(:,1:N),2); % get mean firing rate 
                     fr_avg1(acc,:) = mean(data(t,a).spikes(:,1:200),2); % get mean firing rate 
                     fr_avg2(acc,:) = mean(data(t,a).spikes(:,200:320),2); % get mean firing rate
@@ -65,7 +66,7 @@ classdef ldaClassifier < handle
                 end
             end
             if obj.opt == 2
-                X = [fr_avg,fr_avg1,fr_avg2, fr_avg3];
+                X = [fr_avg,fr_avg1,fr_avg2,fr_avg3];
             elseif obj.opt == 3
                 X = [fr_avg,fr_avg1,fr_avg2, fr_avg3, fr_avg4];
             else
