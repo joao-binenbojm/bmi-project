@@ -18,14 +18,14 @@ classdef KalmanModel
     end
     
     methods
-        function obj = KalmanModel(p)
+        function obj = KalmanModel()
             %KALMANMODEL Construct an instance of this class
             obj.bw = 20;
             obj.delay = 50;
-            obj.p = p;
+            obj.p = 41;
         end
         
-        function [x,y,x_avg,y_avg,x_vel,y_vel,x_acc,y_acc,l] = kinematics(obj,data)
+        function [x,y,x_avg,y_avg,x_vel,y_vel,x_acc,y_acc,l,obj] = kinematics(obj,data)
             % KINEMATICS Calculates multiple kinematic variables
             % data - given struct array
             % x - x position extended to maximum length (assuming stationarity) 
