@@ -3,18 +3,22 @@
 RMSE = zeros(1,50);
 t = zeros(1,50);
 percentage = zeros(1,50);
+dt = [10 20 40 80];
 f = waitbar(0,'Processing...');
-for itr = 1:50
-    
-    [RMSE(itr),t(itr),modelParameters] = testFunction_for_students_MTb('classifier',true);
-    percentage(itr) = modelParameters.percentage/modelParameters.count;
-    waitbar(itr/50,f,'Processing...');
+for p = 1:length(dt)
+    for itr = 1:50
+        param.dt = dt(p);
+        [RMSE(p,itr),t(p,itr),modelParameters] = testFunction_for_students_MTb('classifier',true,param);
+        percentage(p,itr) = modelParameters.percentage/modelParameters.count;
+        waitbar(itr/50,f,'Processing...');
+    end
 end
 close(f);
 beep;
 
 %% Plots
 
+% Classifier comparison
 % 3d
 
 figure;
@@ -50,7 +54,7 @@ ylabel('Running time [s]','Fontsize',20);
 zlabel('Probability density function','Fontsize',20);
 legend('LDA','SVM','ECOC','NN','Ideal','LDA\_PCA');
 
-%2d
+%Contour
 
 figure;
 gmPDF = @(x,y) arrayfun(@(x0,y0) pdf(gm_LDA,[x0 y0]),x,y);
