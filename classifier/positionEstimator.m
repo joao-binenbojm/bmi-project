@@ -27,11 +27,13 @@ function [x, y, newModelParameters] = positionEstimator(testData, modelParameter
     else
         pred_angle = modelParameters.pred_angle;
     end 
+
     modelParameters.pred_angle = pred_angle;
    
     if N>560 % set N limit to 560
         N = 560;
     end
+
     param = modelParameters.R_param; % get PCR regressor model parameters
     idx_bin = N/20-(320/20-1);
     x = param.x_avg_sampled(pred_angle,idx_bin);

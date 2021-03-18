@@ -5,12 +5,26 @@ classdef svmClassifier < handle
     properties
         model
         pred_angle
+        fr_norm
+        P
     end
     
     methods
         function obj = svmClassifier()
             %NBCLASSIFIER Construct an instance of this class
             
+        end
+
+        function [obj] = pca(obj,x,p)
+            %PCA Calculates the principal components 
+            % x - preprocessed firing rate in bins
+            % p - number of components
+            % P - principal components matrix
+            
+            C = cov(x);
+            [V,D] = eig(C);
+            [~,I] = maxk(abs(diag(D)),p);
+            obj.P = V(:,I);
         end
         
         function [sim,obj] = gaussianKernel(obj, x1, x2, sigma)
@@ -24,34 +38,31 @@ classdef svmClassifier < handle
             sim = exp(-(norm(x1 - x2) ^ 2) / (2 * (sigma ^ 2)));
         end
         
-        function [fr_total, fr_avg, obj] = fr_features(obj,data,dt,N)
+        function [fr_avg, X, obj] = fr_features(obj,data,N)
             %FR_FEATURES Calculates the firing rate of the data in bins of size dt.
             % data - given data struct
             % dt - time bin size
             % N - total number of samples length of
             % fr_total - spiking rate divided in bins
             % fr_avg - average spiking rate across bins
+            % X - average spiking rate across bins in different trial sections (prior to movement,
+            % peri-movement and total)
 
             [T,A] = size(data); %get trial and angle length
 
-            acc = 1;
+            acc = 0;
             fr_avg = zeros(T*A,98); % initialise variables
-            fr_total = zeros(T*A,N/dt*98);
+            fr_avg1 = zeros(T*A,98); % initialise variables
+            fr_avg2 = zeros(T*A,98); % initialise variables
             for t=1:1:T
                 for a=1:1:A
-                    fr = zeros(98,length(0:dt:N)-1);
-                    for u=1:1:98
-                        var = data(t,a).spikes(u,1:N);
-                        var(var==0) = NaN; % make zeros equal to NaN
-                        count = histcounts([1:1:N].*var,0:dt:N); % count spikes in every dt bin until N
-                        fr(u,:) = count/dt;
-                    end
-                    fr_avg(acc,:) = mean(fr,2); % get mean firing rate across bins
-                    f = reshape(fr,size(fr,1)*size(fr,2),1);
-                    fr_total(acc,:) = f; % get all firing rates ordered in 98 blocks of the same bin
                     acc = acc+1;
+                    fr_avg(acc,:) = mean(data(t,a).spikes(:,1:N),2); % get mean firing rate across bins
+                    fr_avg1(acc,:) = mean(data(t,a).spikes(:,1:200),2); % get mean firing rate across bins
+                    fr_avg2(acc,:) = mean(data(t,a).spikes(:,200:320),2); % get mean firing rate across bins
                 end
             end
+            X = [fr_avg,fr_avg1,fr_avg2];
         end
         
         function [model,obj] = svmTrain(obj,X, Y, C, kernelFunction, ...
@@ -129,7 +140,6 @@ classdef svmClassifier < handle
             end
 
             % Train
-            fprintf('\nTraining ...');
             dots = 12;
             while passes < max_passes
 
@@ -172,7 +182,7 @@ classdef svmClassifier < handle
 
                         % Compute eta by (14).
                         eta = 2 * K(i,j) - K(i,i) - K(j,j);
-                        if (eta >= 0),
+                        if (eta >= 0)
                             % continue to next i. 
                             continue;
                         end
@@ -223,8 +233,7 @@ classdef svmClassifier < handle
                 else
                     passes = 0;
                 end
-
-                fprintf('.');
+                
                 dots = dots + 1;
                 if dots > 78
                     dots = 0;
@@ -234,7 +243,6 @@ classdef svmClassifier < handle
                     fflush(stdout);
                 end
             end
-            fprintf(' Done! \n\n');
 
             % Save the model
             idx = alphas > 0;
@@ -307,10 +315,8 @@ classdef svmClassifier < handle
             % s - variance (SVM parameter)
             
             [T,~] = size(trainingData); % get size of training data
-    
-            N = 560; % define end time
 
-            [~,fr_avg] = obj.fr_features(trainingData,80,N); % obtaining firing rate feature space from training data
+            [~,X] = fr_features(obj,trainingData,560); % obtaining firing rate feature space from training data
             
             % SVM classifier training
             labels=repmat([1:1:8]',T,1); % generate labels for classifier 
@@ -318,45 +324,45 @@ classdef svmClassifier < handle
             % CLASSIFICATION 1
             % right(0): 3, 4, 5, 6 - left(1): 1, 2, 7, 8
             l = or((labels<=2),(labels>=7));
-            model1 = obj.svmTrain(fr_avg, double(l), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
+            model1 = obj.svmTrain(X, double(l), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
             
             % CLASSIFICATION 2
             % 3, 4 (1) - 5, 6 (0)
             l2_low = labels(~l);
             l2_low_log = l2_low<5;
             idx = ~l;
-            model2_low = obj.svmTrain(fr_avg(idx,:), double(l2_low_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
+            model2_low = obj.svmTrain(X(idx,:), double(l2_low_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
             
             % 1, 2 (1) - 7, 8 (0)
             l2_high = labels(l);
             l2_high_log = l2_high<3;
             idx = l;
-            model2_high = obj.svmTrain(fr_avg(idx,:), double(l2_high_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
+            model2_high = obj.svmTrain(X(idx,:), double(l2_high_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
                 
             % CLASSIFICATION 3
             % 1 (1) - 2 (0)
             l3_high_low = l2_high(l2_high_log); 
             l3_high_low_log = l3_high_low<2;
             idx = labels<3;
-            model3_high_low = obj.svmTrain(fr_avg(idx,:), double(l3_high_low_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
+            model3_high_low = obj.svmTrain(X(idx,:), double(l3_high_low_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
 
             % 7 (1) - 8 (0)
             l3_high_high = l2_high(~l2_high_log); 
             l3_high_high_log = l3_high_high<8;
             idx = labels>6;
-            model3_high_high = obj.svmTrain(fr_avg(idx,:), double(l3_high_high_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
+            model3_high_high = obj.svmTrain(X(idx,:), double(l3_high_high_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
 
             % 3 (1) - 4 (0)
             l3_low_low = l2_low(l2_low_log);
             l3_low_low_log = l3_low_low<4;
             idx = and((labels>2),(labels<5));
-            model3_low_low = obj.svmTrain(fr_avg(idx,:), double(l3_low_low_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
+            model3_low_low = obj.svmTrain(X(idx,:), double(l3_low_low_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
 
             % 5 (1) - 6 (0)
             l3_low_high = l2_low(~l2_low_log); 
             l3_low_high_log = l3_low_high<6;
             idx = and((labels>4),(labels<7));
-            model3_low_high = obj.svmTrain(fr_avg(idx,:), double(l3_low_high_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
+            model3_low_high = obj.svmTrain(X(idx,:), double(l3_low_high_log), C, @(x1, x2) obj.gaussianKernel(x1, x2, s));
 
             predict.model1_3456_1278 = model1;
             predict.model2_34_56 = model2_low;
@@ -375,20 +381,20 @@ classdef svmClassifier < handle
             %test data
             
             N = length(testData.spikes);
-            [~,fr_avg] = obj.fr_features(testData,80,N); % preprocess EEG data
+            [~,X] = obj.fr_features(testData,N); % preprocess EEG data
 
-            pred_1 = obj.svmPredict(obj.model.model1_3456_1278,fr_avg(1,:));
+            pred_1 = obj.svmPredict(obj.model.model1_3456_1278,X(1,:));
             if pred_1 == 1 % left(1): 1, 2, 7, 8
-                pred_2 = obj.svmPredict(obj.model.model2_12_78, fr_avg(1,:)); % 1, 2 (1) - 7, 8 (0)
+                pred_2 = obj.svmPredict(obj.model.model2_12_78, X(1,:)); % 1, 2 (1) - 7, 8 (0)
                 if pred_2 == 1 % 1 (1) - 2 (0)
-                    pred_3 = obj.svmPredict(obj.model.model3_1_2, fr_avg(1,:));
+                    pred_3 = obj.svmPredict(obj.model.model3_1_2, X(1,:));
                     if pred_3 == 1
                         obj.pred_angle = 1;
                     else 
                         obj.pred_angle = 2;
                     end
                 elseif pred_2 == 0 % 7 (1) - 8 (0)
-                    pred_3 = obj.svmPredict(obj.model.model3_7_8, fr_avg(1,:));
+                    pred_3 = obj.svmPredict(obj.model.model3_7_8, X(1,:));
                     if pred_3 == 1 
                         obj.pred_angle = 7;
                     else
@@ -396,16 +402,16 @@ classdef svmClassifier < handle
                     end
                 end
             elseif pred_1 == 0 % right(0): 3, 4, 5, 6 
-                pred_2 = obj.svmPredict(obj.model.model2_34_56, fr_avg(1,:)); % 3, 4 (1) - 5, 6 (0)
+                pred_2 = obj.svmPredict(obj.model.model2_34_56, X(1,:)); % 3, 4 (1) - 5, 6 (0)
                 if pred_2 == 1 % 3 (1) - 4 (0)
-                    pred_3 = obj.svmPredict(obj.model.model3_3_4, fr_avg(1,:));
+                    pred_3 = obj.svmPredict(obj.model.model3_3_4, X(1,:));
                     if pred_3 == 1
                         obj.pred_angle = 3;
                     else 
                         obj.pred_angle = 4;
                     end
                 elseif pred_2 == 0 % 5 (1) - 6 (0)
-                    pred_3 = obj.svmPredict(obj.model.model3_5_6, fr_avg(1,:)); 
+                    pred_3 = obj.svmPredict(obj.model.model3_5_6, X(1,:)); 
                     if pred_3 == 1 
                         obj.pred_angle = 5;
                     else

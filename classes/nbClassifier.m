@@ -5,6 +5,8 @@ classdef nbClassifier < handle
     properties
         model
         pred_angle
+        fr_norm
+        P
     end
     
     methods
@@ -13,34 +15,43 @@ classdef nbClassifier < handle
             
         end
         
-        function [fr_total, fr_avg, obj] = fr_features(obj,data,dt,N)
+        function [obj] = pca(obj,x,p)
+            %PCA Calculates the principal components 
+            % x - preprocessed firing rate in bins
+            % p - number of components
+            % P - principal components matrix
+            
+            C = cov(x);
+            [V,D] = eig(C);
+            [~,I] = maxk(abs(diag(D)),p);
+            obj.P = V(:,I);
+        end
+        
+        function [fr_avg, X, obj] = fr_features(obj,data,N)
             %FR_FEATURES Calculates the firing rate of the data in bins of size dt.
             % data - given data struct
             % dt - time bin size
             % N - total number of samples length of
             % fr_total - spiking rate divided in bins
             % fr_avg - average spiking rate across bins
+            % X - average spiking rate across bins in different trial sections (prior to movement,
+            % peri-movement and total)
 
             [T,A] = size(data); %get trial and angle length
 
-            acc = 1;
+            acc = 0;
             fr_avg = zeros(T*A,98); % initialise variables
-            fr_total = zeros(T*A,N/dt*98);
+            fr_avg1 = zeros(T*A,98); % initialise variables
+            fr_avg2 = zeros(T*A,98); % initialise variables
             for t=1:1:T
                 for a=1:1:A
-                    fr = zeros(98,length(0:dt:N)-1);
-                    for u=1:1:98
-                        var = data(t,a).spikes(u,1:N);
-                        var(var==0) = NaN; % make zeros equal to NaN
-                        count = histcounts([1:1:N].*var,0:dt:N); % count spikes in every dt bin until N
-                        fr(u,:) = count/dt;
-                    end
-                    fr_avg(acc,:) = mean(fr,2); % get mean firing rate across bins
-                    f = reshape(fr,size(fr,1)*size(fr,2),1);
-                    fr_total(acc,:) = f; % get all firing rates ordered in 98 blocks of the same bin
                     acc = acc+1;
+                    fr_avg(acc,:) = mean(data(t,a).spikes(:,1:N),2); % get mean firing rate across bins
+                    fr_avg1(acc,:) = mean(data(t,a).spikes(:,1:200),2); % get mean firing rate across bins
+                    fr_avg2(acc,:) = mean(data(t,a).spikes(:,200:320),2); % get mean firing rate across bins
                 end
             end
+            X = [fr_avg,fr_avg1,fr_avg2];
         end
    
         function [obj] = fit(obj,trainingData)
@@ -48,13 +59,18 @@ classdef nbClassifier < handle
             
             [T,~] = size(trainingData); % get size of training data
     
-            N = 560; % define end time
-
-            [~,fr_avg] = obj.fr_features(trainingData,80,N); % obtaining firing rate feature space from training data
-    
+            [~,X] = obj.fr_features(trainingData,560); % obtaining firing rate feature space from training data
+%             obj.fr_norm.mean = mean(X,1);
+%             obj.fr_norm.std = std(X,1);
+%             X = (X-obj.fr_norm.mean)./obj.fr_norm.std;
+%             X(isnan(X)) = 0;
+%             X(isinf(X)) = 0;
+%             obj.pca(X,10);
+%             X = X*obj.P;
+            
             % NB classifier training
             Y=repmat([1:1:8]',T,1); % generate labels for classifier 
-            obj.model = fitcnb(fr_avg,Y,'DistributionNames','kernel'); % Naive Bayesian classifier
+            obj.model = fitcnb(X,Y,'DistributionNames','kernel'); % Naive Bayesian classifier
         end
         
         function [out,obj] = predict(obj,testData)
@@ -62,8 +78,11 @@ classdef nbClassifier < handle
             %test data
             
             N = length(testData.spikes);
-            [~,fr_avg] = obj.fr_features(testData,80,N); % preprocess EEG data
-            out = predict(obj.model,fr_avg); % classify angle from Naive Bayesian
+            [~,X] = obj.fr_features(testData,N); % preprocess EEG data
+%             X(isnan(X)) = 0;
+%             X(isinf(X)) = 0;
+%             X = X*obj.P;
+            out = predict(obj.model,X); % classify angle from Naive Bayesian
             obj.pred_angle = out;
         end
     end
