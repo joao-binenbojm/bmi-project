@@ -12,10 +12,10 @@ function  [modelParameters] = positionEstimatorTraining(trainingData)
     
     class = Classifier(); % create Classifier class
     
-%     C_param.LDA = class.LDA.fit(trainingData); % LDA classifier
+    C_param.LDA = class.LDA.fit(trainingData); % LDA classifier
 %     C_param.SVM = class.SVM.fit(trainingData,5,0.05); % SVM classifier
 %     C_param.NN = class.NN.fit(trainingData); % NN classifier
-    C_param.NB = class.NB.fit(trainingData); % NB classifier
+%     C_param.NB = class.NB.fit(trainingData); % NB classifier
 %     C_param.ECOC = class.ECOC.fit(trainingData); % ECOC classifier
     
     % PCR regressor training
