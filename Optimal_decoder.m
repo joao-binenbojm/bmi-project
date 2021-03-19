@@ -13,7 +13,7 @@ beep;
 
 %% Plots
 
-% Classifier comparison
+% Decoder comparison
 % 3d
 
 figure;
