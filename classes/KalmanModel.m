@@ -79,6 +79,7 @@ classdef KalmanModel
             [~,~,obj.x_avg,obj.y_avg,~,~,~,~,~] = kinematics(training_data);
             X_A(1:A) = {zeros(4, 1e5)}; % initialise variables
             Y_A(1:A) = {zeros(4, 1e5)};
+            X_H(1:A) = {zeros(4, 1e5)};
             Y_H(1:A) = {zeros(98, 1e5)};
             obj.V = cell(1,8);
             
