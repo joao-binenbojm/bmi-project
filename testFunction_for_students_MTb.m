@@ -4,7 +4,7 @@
 % the relevant modelParameters, and then calls the function
 % "positionEstimator" to decode the trajectory. 
 
-function RMSE = testFunction_for_students_MTb(teamName)
+function [RMSE,elapsedTime] = testFunction_for_students_MTb(teamName)
 
 load monkeydata0.mat
 
@@ -29,6 +29,7 @@ axis square
 grid
 
 % Train Model
+timerVal = tic;
 modelParameters = positionEstimatorTraining(trainingData);
 
 for tr=1:size(testData,1)
@@ -65,11 +66,11 @@ for tr=1:size(testData,1)
         plot(testData(tr,direc).handPos(1,times),testData(tr,direc).handPos(2,times),'b')
     end
 end
+elapsedTime = toc(timerVal)
 
 legend('Decoded Position', 'Actual Position')
 
 RMSE = sqrt(meanSqError/n_predictions) 
 
 rmpath(genpath(teamName))
-
 end
