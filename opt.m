@@ -44,11 +44,15 @@ gm_LDA_PCA = gmdistribution([mean(LDA_PCA.RMSE),mean(LDA_PCA.t)],[std(LDA_PCA.RM
 plt_LDA_PCA = fsurf(@(x,y)reshape(pdf(gm_LDA_PCA,[x(:),y(:)]),size(x)),[min(LDA_PCA.RMSE)-10 max(LDA_PCA.RMSE)+10 min(LDA_PCA.t)-10 max(LDA_PCA.t)+10]);
 plt_LDA_PCA.FaceColor = 'b';
 plt_LDA_PCA.ShowContours = 'on';
+gm_LDA_PCA_3 = gmdistribution([mean(LDA_PCA_3.RMSE),mean(LDA_PCA_3.t)],[std(LDA_PCA_3.RMSE),std(LDA_PCA_3.t)]);
+plt_LDA_PCA_3 = fsurf(@(x,y)reshape(pdf(gm_LDA_PCA_3,[x(:),y(:)]),size(x)),[min(LDA_PCA_3.RMSE)-10 max(LDA_PCA_3.RMSE)+10 min(LDA_PCA_3.t)-10 max(LDA_PCA_3.t)+10]);
+plt_LDA_PCA_3.FaceColor = 'b';
+plt_LDA_PCA_3.ShowContours = 'on';
 set(gca,'Fontsize',15);
 xlabel('RMSE','Fontsize',20);
 ylabel('Running time [s]','Fontsize',20);
 zlabel('Probability density function','Fontsize',20);
-legend('LDA','SVM','ECOC','NN','Ideal','LDA\_PCA');
+legend('LDA','SVM','ECOC','NN','Ideal','LDA\_PCA','LDA\_PCA\_3');
 
 %2d
 
@@ -66,7 +70,9 @@ gmPDF = @(x,y) arrayfun(@(x0,y0) pdf(gm_Ideal,[x0 y0]),x,y);
 fcontour(gmPDF,[min(Ideal.RMSE)-10 max(Ideal.RMSE)+10 min(Ideal.t)-10 max(Ideal.t)+10],'Fill','off','LineWidth',2);
 gmPDF = @(x,y) arrayfun(@(x0,y0) pdf(gm_LDA_PCA,[x0 y0]),x,y);
 fcontour(gmPDF,[min(LDA_PCA.RMSE)-10 max(LDA_PCA.RMSE)+10 min(LDA_PCA.t)-10 max(LDA_PCA.t)+10],'Fill','off','LineWidth',2);
-set(gca,'Fontsize',15,'yscal','log');
+gmPDF = @(x,y) arrayfun(@(x0,y0) pdf(gm_LDA_PCA_3,[x0 y0]),x,y);
+fcontour(gmPDF,[min(LDA_PCA_3.RMSE)-10 max(LDA_PCA_3.RMSE)+10 min(LDA_PCA_3.t)-10 max(LDA_PCA_3.t)+10],'Fill','off','LineWidth',2);
+set(gca,'Fontsize',15);
 xlabel('RMSE','Fontsize',20);
 ylabel('Running time [s]','Fontsize',20);
 % legend('LDA','SVM','ECOC','NN','Ideal');
