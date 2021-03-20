@@ -21,7 +21,7 @@ classdef KalmanModel
         function obj = KalmanModel()
             %KALMANMODEL Construct an instance of this class
             obj.bw = 20;
-            obj.delay = 20;
+            obj.delay = 50;
         end
         
         function [x_avg,y_avg,obj] = kinematics(obj,data)
