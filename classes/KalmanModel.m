@@ -21,7 +21,7 @@ classdef KalmanModel
         function obj = KalmanModel()
             %KALMANMODEL Construct an instance of this class
             obj.bw = 20;
-            obj.delay = 0;
+            obj.delay = 20;
         end
         
         function [x_avg,y_avg,obj] = kinematics(obj,data)
@@ -96,9 +96,6 @@ classdef KalmanModel
                 X_H(direc) = {X_A{direc}(:, 1:samp_count)};
                 Y_A(direc) = {[Y_A{direc}(:, 1:samp_count);ones(1,samp_count)]};
                 
-                % Square-root transform
-%                 Y_H(direc) = {sqrt(Y_H{direc})};
-                
                 % Normalizing frequency data (saving params for later normalization)
                 obj.f_norm(direc).avg = mean(Y_H{direc}(:, 1:samp_count), 2);
                 obj.f_norm(direc).stdev = std(Y_H{direc}(:, 1:samp_count), [], 2);
@@ -109,7 +106,7 @@ classdef KalmanModel
                 Y_H(direc) = {Y_dummy};
                 C = cov(Y_H{direc}');
                 [V_eig,D] = eig(C);
-                [~,I] = maxk(abs(diag(D)), 80);
+                [~,I] = maxk(abs(diag(D)), 41);
                 obj.V(direc) = {V_eig(:, I)};
                 Y_H(direc) = {(Y_H{direc}'*obj.V{direc})'}; % Projection onto PCA subspace
                 obj.pca_mean(direc) = {mean(Y_H{direc},2)};
@@ -144,7 +141,6 @@ classdef KalmanModel
             end
             % Extracting observation information
             freqs = mean(test_data.spikes(:, end-obj.bw-obj.delay+1:end-obj.delay), 2);
-%             freqs = sqrt(freqs);
             freqs = (freqs - obj.f_norm(pred_angle).avg)./(obj.f_norm(pred_angle).stdev);
             freqs(isnan(freqs)) = 0;
             freqs(isinf(freqs)) = 0;
