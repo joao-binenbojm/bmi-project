@@ -27,9 +27,13 @@ gm_Kalman = gmdistribution([mean(Kalman.RMSE),mean(Kalman.t)],[std(Kalman.RMSE),
 plt_Kalman = fsurf(@(x,y)reshape(pdf(gm_Kalman,[x(:),y(:)]),size(x)),[min(Kalman.RMSE)-10 max(Kalman.RMSE)+10 min(Kalman.t)-10 max(Kalman.t)+10]);
 plt_Kalman.FaceColor = 'g';
 plt_Kalman.ShowContours = 'on';
+gm_Kalman_trajectory = gmdistribution([mean(Kalman_trajectory.RMSE),mean(Kalman_trajectory.t)],[std(Kalman_trajectory.RMSE),std(Kalman_trajectory.t)]);
+plt_Kalman_trajectory = fsurf(@(x,y)reshape(pdf(gm_Kalman_trajectory,[x(:),y(:)]),size(x)),[min(Kalman_trajectory.RMSE)-10 max(Kalman_trajectory.RMSE)+10 min(Kalman_trajectory.t)-10 max(Kalman_trajectory.t)+10]);
+plt_Kalman_trajectory.FaceColor = '	#006400';
+plt_Kalman_trajectory.ShowContours = 'on';
 xlabel('RMSE','Fontsize',20);
 ylabel('Running time [s]','Fontsize',20);
-legend('Mean trajectory','Kalman');
+legend('Mean trajectory','Kalman','Kalman - trajectory');
 
 %Contour
 
@@ -39,6 +43,8 @@ fcontour(gmPDF,[min(Mean.RMSE)-10 max(Mean.RMSE)+10 min(Mean.t)-10 max(Mean.t)+1
 hold on;
 gmPDF = @(x,y) arrayfun(@(x0,y0) pdf(gm_Kalman,[x0 y0]),x,y);
 fcontour(gmPDF,[min(Kalman.RMSE)-10 max(Kalman.RMSE)+10 min(Kalman.t)-10 max(Kalman.t)+10],'MeshDensity',100,'Fill','off','LineWidth',2);
+gmPDF = @(x,y) arrayfun(@(x0,y0) pdf(gm_Kalman_trajectory,[x0 y0]),x,y);
+fcontour(gmPDF,[min(Kalman_trajectory.RMSE)-10 max(Kalman_trajectory.RMSE)+10 min(Kalman_trajectory.t)-10 max(Kalman_trajectory.t)+10],'MeshDensity',100,'Fill','off','LineWidth',2);
 set(gca,'Fontsize',15);
 xlabel('RMSE','Fontsize',20);
 ylabel('Running time [s]','Fontsize',20);
