@@ -66,7 +66,7 @@ classdef KalmanModel
             % format for supervised learning
 
             [T,A] = size(training_data); % get data size
-            [obj.x_avg,obj.y_avg] = kinematics(training_data);
+            [obj.x_avg,obj.y_avg] = kinematics(obj,training_data);
             X_A(1:A) = {zeros(4, 1e5)}; % initialise variables
             Y_A(1:A) = {zeros(4, 1e5)};
             X_H(1:A) = {zeros(4, 1e5)};
