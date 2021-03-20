@@ -4,8 +4,7 @@ classdef KalmanModel
     properties
         bw
         delay
-        x_avg
-        y_avg
+        pos_avg
         A
         H
         Q
@@ -21,21 +20,14 @@ classdef KalmanModel
         function obj = KalmanModel()
             %KALMANMODEL Construct an instance of this class
             obj.bw = 20;
-            obj.delay = 50;
+            obj.delay = 0;
         end
         
-        function [x_avg,y_avg,obj] = kinematics(obj,data)
+        function [pos_avg,obj] = kinematics(obj,data)
             % KINEMATICS Calculates multiple kinematic variables
             % data - given struct array
-            % x - x position extended to maximum length (assuming stationarity) 
-            % y - y position extended to maximum length (assuming stationarity) 
-            % x_avg - mean x position extended to maximum length (assuming stationarity) 
-            % y_avg - mean y position extended to maximum length (assuming stationarity) 
-            % x_vel - x velocity extended to maximum length (assuming stationarity) 
-            % y_vel - y velocity extended to maximum length (assuming stationarity)
-            % x_acc - x acceleration extended to maximum length (assuming stationarity)
-            % y_acc - y acceleration extended to maximum length (assuming stationarity)  
-            % l - time length (N) of each trial
+            % pos_avg - array containing average hand position for
+            % different angles
 
             data_cell = struct2cell(data); % convert to cell matrix
             max_length = @(x) length(x); % function handle to get max length of all elements in cell
@@ -45,19 +37,14 @@ classdef KalmanModel
             L = max(l,[],'all');
 
             [T,A] = size(data); % get dimensions of data
-            x_avg = zeros(A,L); % initialise variables
-            y_avg = zeros(A,L);
-            x = zeros(T,A,L);
-            y = zeros(T,A,L);
+            pos_avg = zeros(A,2,L);
+            pos = zeros(T,A,2,L);
             for a = 1:1:A
                 for t = 1:1:T
-                    var_x = data(t,a).handPos(1,:);
-                    var_y = data(t,a).handPos(2,:);
-                    x(t,a,:) = [var_x var_x(end)*ones(1,L-length(var_x))];
-                    y(t,a,:) = [var_y var_y(end)*ones(1,L-length(var_y))];
+                    pos(t,a,:,:) = [data(t,a).handPos(1:2,:), ...
+                        data(t,a).handPos(1:2,end).*ones(2,L-length(data(t,a).handPos))];
                 end
-                x_avg(a,:) = squeeze(mean(x(:,a,:),1))';
-                y_avg(a,:) = squeeze(mean(y(:,a,:),1))';
+                pos_avg(a,:,:) = squeeze(mean(pos(:,a,:,:))); 
             end
 
         end
@@ -67,24 +54,25 @@ classdef KalmanModel
             % format for supervised learning
 
             [T,A] = size(training_data); % get data size
-            [obj.x_avg,obj.y_avg] = obj.kinematics(training_data);
+            obj.pos_avg = obj.kinematics(training_data);
             X_A(1:A) = {zeros(4, 1e5)}; % initialise variables
             Y_A(1:A) = {zeros(4, 1e5)};
             Y_H(1:A) = {zeros(98, 1e5)};
+            X_H(1:A) = {zeros(98, 1e5)};
             obj.V = cell(1,8);
             obj.pca_mean = cell(1,8);
             
             for direc = 1:A
                 samp_count = 0;
                 for tr = 1:T
-                    for t = max([obj.bw+obj.delay,21]):20:length(training_data(tr, direc).spikes)-20
+                    for t = 320:20:min([560,length(training_data(tr,direc).spikes)-20])
                         samp_count = samp_count + 1;
                         X_A{direc}(1:2, samp_count) = training_data(tr, direc).handPos(1:2, t)...
-                            - [obj.x_avg(direc, t); obj.y_avg(direc, t)];
+                            - obj.pos_avg(direc,:,t)';
                         X_A{direc}(3:4, samp_count) = (training_data(tr, direc).handPos(1:2, t)...
                             - training_data(tr, direc).handPos(1:2, t-20))/0.02;
                         Y_A{direc}(1:2, samp_count) = training_data(tr, direc).handPos(1:2, t+20)...
-                             - [obj.x_avg(direc, t+20); obj.y_avg(direc, t+20)];
+                             - obj.pos_avg(direc,:,t+20)';
                         Y_A{direc}(3:4, samp_count) = (training_data(tr, direc).handPos(1:2, t+20)...
                             - training_data(tr, direc).handPos(1:2, t))/0.02;
                         Y_H{direc}(:, samp_count) = mean(training_data(tr, direc).spikes(:, t-obj.bw-obj.delay+1:t-obj.delay), 2);
@@ -106,7 +94,7 @@ classdef KalmanModel
                 Y_H(direc) = {Y_dummy};
                 C = cov(Y_H{direc}');
                 [V_eig,D] = eig(C);
-                [~,I] = maxk(abs(diag(D)), 41);
+                [~,I] = maxk(abs(diag(D)), 80);
                 obj.V(direc) = {V_eig(:, I)};
                 Y_H(direc) = {(Y_H{direc}'*obj.V{direc})'}; % Projection onto PCA subspace
                 obj.pca_mean(direc) = {mean(Y_H{direc},2)};
@@ -135,8 +123,7 @@ classdef KalmanModel
             L = length(test_data.spikes);
             % Selecting past state value
             if length(test_data.spikes) <= 320
-                obj.x_past = [test_data.startHandPos - ...
-                    [obj.x_avg(pred_angle, 1); obj.y_avg(pred_angle, 1)]; 0; 0; 1]; % start at 0 velocity
+                obj.x_past = [test_data.startHandPos-obj.pos_avg(pred_angle,:,1)'; 0; 0; 1]; % start at 0 velocity
                 obj.P_past = zeros(size(obj.W{pred_angle}));
             end
             % Extracting observation information
@@ -154,16 +141,15 @@ classdef KalmanModel
             x_current = x_priori + K*(freqs - obj.H{pred_angle}*x_priori);
             P_current = (eye(size(K, 1)) - K * obj.H{pred_angle})*P_priori;
             % Update appropriate quantities
-            if L <= length(obj.x_avg)
-                x = x_current(1) + obj.x_avg(pred_angle, L); 
-                y = x_current(2) + obj.y_avg(pred_angle, L);
+            if L <= length(obj.pos_avg)
+                x = x_current(1) + obj.pos_avg(pred_angle, 1, L); 
+                y = x_current(2) + obj.pos_avg(pred_angle, 2, L);
             else
-                x = x_current(1) + obj.x_avg(pred_angle, end); 
-                y = x_current(2) + obj.y_avg(pred_angle, end);
+                x = x_current(1) + obj.pos_avg(pred_angle, 1, end); 
+                y = x_current(2) + obj.pos_avg(pred_angle, 2, end);
             end
             obj.P_past = P_current;
             obj.x_past = x_current;
         end
     end
 end
-
