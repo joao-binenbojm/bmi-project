@@ -1,12 +1,12 @@
 %% RANDOM SEED RMSE CALCULATOR
 
-RMSE = zeros(1,50);
-t = zeros(1,50);
-percentage = zeros(1,50);
+RMSE = zeros(1,100);
+t = zeros(1,100);
+percentage = zeros(1,100);
 f = waitbar(0,'Processing...');
-for itr = 1:50
+for itr = 1:100
     [RMSE(itr),t(itr),modelParameters] = testFunction_for_students_MTb('kalman',true);
-    waitbar(itr/50,f,'Processing...');
+    waitbar(itr/100,f,'Processing...');
 end
 close(f);
 beep;
@@ -17,7 +17,7 @@ beep;
 % 3d
 
 figure;
-load('Decoder_comparison.mat');
+% load('Decoder_comparison.mat');
 gm_Mean = gmdistribution([mean(Mean.RMSE),mean(Mean.t)],[std(Mean.RMSE),std(Mean.t)]);
 plt_Mean = fsurf(@(x,y)reshape(pdf(gm_Mean,[x(:),y(:)]),size(x)),[min(Mean.RMSE)-10 max(Mean.RMSE)+10 min(Mean.t)-10 max(Mean.t)+10]);
 plt_Mean.FaceColor = 'b';
