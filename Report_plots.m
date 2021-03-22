@@ -8,16 +8,20 @@ set(groot, 'defaultLegendInterpreter','latex');
 load('LDA_different_stages_performance');
 
 figure;
-boxplot([LDA1.RMSE;LDA2.RMSE;LDA3.RMSE]');
-set(gca,'FontSize',15);
-xlabel('LDA stages','FontSize',20);
+hold on;
+% boxplot([LDA1.RMSE;LDA2.RMSE;LDA3.RMSE]');
+yyaxis right
+h = errorbar(mean([LDA1.RMSE;LDA2.RMSE;LDA3.RMSE]'),std([LDA1.RMSE;LDA2.RMSE;LDA3.RMSE]'),'Color','g','LineWidth',2);
 ylabel('RMSE','FontSize',20);
-
-figure;
-boxplot([LDA1.percentage;LDA2.percentage;LDA3.percentage]');
-set(gca,'FontSize',15);
+yyaxis left
+a = boxplot([LDA1.percentage;LDA2.percentage;LDA3.percentage]');
+uistack(a,'top');
+set(gca,'FontSize',15,'defaultAxesColorOrder',[[1,1,1];[0,1,0]]);
 xlabel('LDA stages','FontSize',20);
-ylabel('Percentage','FontSize',20);
+ylabel('Accuracy percentage','FontSize',20);
+ax = gca;
+ax.YAxis(1).Color = 'k';
+ax.YAxis(2).Color = 'g';
 
 %% Decoder comparison
 close all; clc; clear variables;
