@@ -109,6 +109,7 @@ gm_NN = gmdistribution([mean(NN.RMSE),mean(NN.t)],[std(NN.RMSE),std(NN.t)]);
 plt_NN = fsurf(@(x,y)reshape(pdf(gm_NN,[x(:),y(:)]),size(x)),[min(NN.RMSE)-10 max(NN.RMSE)+10 min(NN.t)-10 max(NN.t)+10]);
 plt_NN.FaceColor = '#ffa500';
 plt_NN.ShowContours = 'on';
+set(gca,'Fontsize',15);
 xlabel('RMSE','Fontsize',20);
 ylabel('Running time [s]','Fontsize',20);
 xlim([0,20]);
