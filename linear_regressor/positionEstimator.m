@@ -13,20 +13,30 @@ function [x, y, newModelParameters] = positionEstimator(testData, modelParameter
     % test_data(m).spikes(i,t) (m = trial id, i = neuron id, t = time)
     % in this case, t goes from 1 to the current time in steps of 20
     
-    % Classification testing
-    
     N = length(testData.spikes); % get trial length
     
-    if N==320 || N==400 || N==480 || N==560
-        pred_angle = modelParameters.C_param.LDA.predict(testData); % classify angle from LDA 
-        modelParameters.pred_angle = pred_angle;
+    % Classification testing
+    C_param = modelParameters.C_param; % extract classification parameters
+    
+    if N==320
+        pred_angle = C_param.LDA1.predict(testData); % classify angle from LDA 
+    elseif N==440
+        pred_angle = C_param.LDA2.predict(testData);
+    elseif N==560
+        pred_angle = C_param.LDA3.predict(testData);
     else
         pred_angle = modelParameters.pred_angle;
+    end 
+    modelParameters.pred_angle = pred_angle;
+
+    if N==560
+        modelParameters.percentage = modelParameters.percentage+double(pred_angle==modelParameters.real_angle);
+        modelParameters.count = modelParameters.count+1;
     end
     
     % PCR regressor testing
     
-    [x,y] = modelParameters.R_param.predict(testData,pred_angle,'pos');
+    [x,y] = modelParameters.R_param.predict(testData,pred_angle,'avg');
     
     modelParameters.pred_pos = [x y];
     newModelParameters = modelParameters;
