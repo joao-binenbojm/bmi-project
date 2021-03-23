@@ -3,7 +3,9 @@ classdef Classifier
     
     properties
         NN
-        LDA
+        LDA1
+        LDA2
+        LDA3
         SVM
         NB
         ECOC
@@ -14,7 +16,9 @@ classdef Classifier
             %CLASSIFIER Construct an instance of this class
             
             obj.NN = nnClassifier();
-            obj.LDA = ldaClassifier();
+            obj.LDA1 = ldaClassifier(1);
+            obj.LDA2 = ldaClassifier(2);
+            obj.LDA3 = ldaClassifier(3);
             obj.SVM = svmClassifier();
             obj.NB = nbClassifier();
             obj.ECOC = ecocClassifier();
