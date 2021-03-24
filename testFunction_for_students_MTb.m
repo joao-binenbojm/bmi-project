@@ -56,9 +56,8 @@ for tr=1:size(testData,1)
             past_current_trial.decodedHandPos = decodedHandPos;
 
             past_current_trial.startHandPos = testData(tr,direc).handPos(1:2,1); 
-            if percentage
-                past_current_trial.angle = direc;
-            end
+            past_current_trial.angle = direc;
+                
             if nargout('positionEstimator') == 3
                 [decodedPosX, decodedPosY, newParameters] = positionEstimator(past_current_trial, modelParameters);
                 modelParameters = newParameters;
