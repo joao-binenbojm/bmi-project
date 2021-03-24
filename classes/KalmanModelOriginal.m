@@ -1,4 +1,4 @@
-classdef KalmanModel
+classdef KalmanModelOriginal
     %KALMANMODEL Model that accounts for learning matrices A and H
     
     properties
@@ -13,7 +13,7 @@ classdef KalmanModel
     end
     
     methods
-        function obj = KalmanModel()
+        function obj = KalmanModelOriginal()
             %KALMANMODEL Construct an instance of this class
         end
         
