@@ -30,7 +30,7 @@ function [x, y, newModelParameters] = positionEstimator(testData, modelParameter
     modelParameters.pred_angle = pred_angle;
 
     if N==560
-        modelParameters.percentage = modelParameters.percentage+double(pred_angle==modelParameters.real_angle);
+        modelParameters.percentage = modelParameters.percentage+double(pred_angle==testData.angle);
         modelParameters.count = modelParameters.count+1;
     end
     
