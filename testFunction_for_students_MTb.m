@@ -4,7 +4,7 @@
 % the relevant modelParameters, and then calls the function
 % "positionEstimator" to decode the trajectory. 
 
-function [RMSE,elapsedTime,modelParameters] = testFunction_for_students_MTb(teamName,opt)
+function [RMSE,elapsedTime,modelParameters] = testFunction_for_students_MTb(teamName,opt,percentage)
 
 load monkeydata0.mat
 
@@ -34,6 +34,10 @@ end
 % Train Model
 timerVal = tic;
 modelParameters = positionEstimatorTraining(trainingData);
+if percentage
+    modelParameters.count = 0;
+    modelParameters.percentage = 0;
+end
 
 for tr=1:size(testData,1)
     if ~opt
@@ -51,7 +55,9 @@ for tr=1:size(testData,1)
             past_current_trial.decodedHandPos = decodedHandPos;
 
             past_current_trial.startHandPos = testData(tr,direc).handPos(1:2,1); 
-            
+            if percentage
+                past_current_trial.angle = direc;
+            end
             if nargout('positionEstimator') == 3
                 [decodedPosX, decodedPosY, newParameters] = positionEstimator(past_current_trial, modelParameters);
                 modelParameters = newParameters;
