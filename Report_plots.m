@@ -11,7 +11,7 @@ figure;
 hold on;
 % boxplot([LDA1.RMSE;LDA2.RMSE;LDA3.RMSE]');
 yyaxis right
-h = errorbar(mean([LDA1.RMSE;LDA2.RMSE;LDA3.RMSE]'),std([LDA1.RMSE;LDA2.RMSE;LDA3.RMSE]'),'Color','g','LineWidth',2);
+h = errorbar(mean([LDA1.RMSE;LDA2.RMSE;LDA3.RMSE]'),std([LDA1.RMSE;LDA2.RMSE;LDA3.RMSE]'),'Color','	#228B22','LineWidth',2);
 ylabel('RMSE','FontSize',20);
 yyaxis left
 a = boxplot([LDA1.percentage;LDA2.percentage;LDA3.percentage]');
@@ -21,7 +21,7 @@ xlabel('LDA stages','FontSize',20);
 ylabel('Accuracy percentage','FontSize',20);
 ax = gca;
 ax.YAxis(1).Color = 'k';
-ax.YAxis(2).Color = 'g';
+ax.YAxis(2).Color = '#228B22';
 
 %% Decoder comparison
 close all; clc; clear variables;
