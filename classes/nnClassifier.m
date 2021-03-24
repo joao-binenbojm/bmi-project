@@ -29,9 +29,18 @@ classdef nnClassifier
                                         'LearnRateDropFactor',0.95, ...
                                         'LearnRateDropPeriod',5);
             obj.layers = [imageInputLayer([98*320, 1, 1], 'Normalization', 'zscore')
-                        fullyConnectedLayer(7)
+                        fullyConnectedLayer(100)
                         batchNormalizationLayer
                         reluLayer
+                        dropoutLayer
+                        fullyConnectedLayer(100)
+                        batchNormalizationLayer
+                        reluLayer
+                        dropoutLayer
+                        fullyConnectedLayer(100)
+                        batchNormalizationLayer
+                        reluLayer
+                        dropoutLayer
                         fullyConnectedLayer(8)
                         softmaxLayer
                         classificationLayer];
@@ -76,4 +85,3 @@ classdef nnClassifier
         end
     end
 end
-
