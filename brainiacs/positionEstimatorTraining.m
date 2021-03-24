@@ -8,7 +8,7 @@ function [model] = positionEstimatorTraining(training_data)
   %     training_data(n,k).handPos(d,t) (d = dimension [1-3], t = time)
   A_npcr = 4;
   H_npcr = 4;
-  model = KalmanModel();
+  model = KalmanModelOriginal();
   model = model.fit(training_data, A_npcr, H_npcr);
   
   % Return Value:
