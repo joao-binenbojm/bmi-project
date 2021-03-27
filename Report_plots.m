@@ -60,6 +60,7 @@ legend('Mean trajectory','Kalman','Kalman - trajectory','Kalman - OLS','Kalman -
 %Contour
 
 figure;
+subplot(1,2,1);
 gmPDF = @(x,y) arrayfun(@(x0,y0) pdf(gm_Ideal,[x0 y0]),x,y);
 fcontour(gmPDF,[min(Mean.RMSE)-10 max(Mean.RMSE)+10 min(Mean.t)-10 max(Mean.t)+10],'MeshDensity',100,'Fill','off','LineWidth',2);
 hold on;
@@ -82,7 +83,6 @@ set(groot, 'defaultLegendInterpreter','latex');
 
 % 3d
 
-figure;
 load('Classifier_comparison_fast_100.mat');
 gm_Ideal = gmdistribution([mean(Ideal.RMSE),mean(Ideal.t)],[std(Ideal.RMSE),std(Ideal.t)]);
 plt_Ideal = fsurf(@(x,y)reshape(pdf(gm_Ideal,[x(:),y(:)]),size(x)),[min(Ideal.RMSE)-10 max(Ideal.RMSE)+10 min(Ideal.t)-10 max(Ideal.t)+10]);
@@ -119,6 +119,7 @@ legend('Ideal classifier','LDA\_MS','LDA\_Traditional','SVM','ECOC','NN');
 %Contour
 
 figure;
+subplot(1,2,2);
 gmPDF = @(x,y) arrayfun(@(x0,y0) pdf(gm_Ideal,[x0 y0]),x,y);
 fcontour(gmPDF,[min(Ideal.RMSE)-10 max(Ideal.RMSE)+10 min(Ideal.t)-10 max(Ideal.t)+10],'MeshDensity',100,'Fill','off','LineWidth',2);
 hold on;
@@ -135,3 +136,20 @@ fcontour(gmPDF,[min(NN.RMSE)-10 max(NN.RMSE)+10 min(NN.t)-10 max(NN.t)+10],'Mesh
 set(gca,'Fontsize',15);
 xlabel('RMSE','Fontsize',20);
 ylabel('Running time [s]','Fontsize',20);
+
+%% Grid search
+close all; clc; clear variables;
+set(groot, 'defaultTextInterpreter','latex'); 
+set(groot, 'defaultLegendInterpreter','latex');
+
+load('gs_kalman_8_bw_lag');
+
+rmse = mean(RMSE,3);
+
+surf(linspace(20,100,size(rmse,2)),linspace(0,100,size(rmse,1)),rmse);
+set(gca,'FontSize',15);
+xlabel('$\Delta t$ [ms]','FontSize',20);
+ylabel('$\delta$ [ms]','FontSize',20);
+zlabel('RMSE','FontSize',20);
+zlim([7 10]);
+

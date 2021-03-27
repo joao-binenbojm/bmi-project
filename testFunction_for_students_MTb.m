@@ -4,8 +4,23 @@
 % the relevant modelParameters, and then calls the function
 % "positionEstimator" to decode the trajectory. 
 
-function [RMSE,elapsedTime,modelParameters] = testFunction_for_students_MTb(teamName,opt,percentage)
+function [RMSE,elapsedTime,modelParameters] = testFunction_for_students_MTb(varargin)
 
+teamName = varargin{1};
+if nargin == 1
+    opt = false(1);
+    percentage = false(1);
+    param = [];
+elseif nargin == 3
+    opt = varargin{2};
+    percentage = varargin{3};
+    param = [];
+elseif nargin == 4
+    opt = varargin{2};
+    percentage = varargin{3};
+    param = varargin{4};
+end
+    
 load monkeydata0.mat
 
 % Set random number generator
@@ -34,7 +49,7 @@ end
 
 % Train Model
 timerVal = tic;
-modelParameters = positionEstimatorTraining(trainingData);
+modelParameters = positionEstimatorTraining(trainingData,param);
 if percentage
     modelParameters.percentage = 0;
     modelParameters.count = 0;
