@@ -119,7 +119,7 @@ legend('Ideal classifier','LDA\_MS','LDA\_Traditional','SVM','ECOC','NN');
 %Contour
 
 figure;
-subplot(1,2,2);
+subplot(1,2,1);
 gmPDF = @(x,y) arrayfun(@(x0,y0) pdf(gm_Ideal,[x0 y0]),x,y);
 fcontour(gmPDF,[min(Ideal.RMSE)-10 max(Ideal.RMSE)+10 min(Ideal.t)-10 max(Ideal.t)+10],'MeshDensity',100,'Fill','off','LineWidth',2);
 hold on;
@@ -136,8 +136,10 @@ fcontour(gmPDF,[min(NN.RMSE)-10 max(NN.RMSE)+10 min(NN.t)-10 max(NN.t)+10],'Mesh
 set(gca,'Fontsize',15);
 xlabel('RMSE','Fontsize',20);
 ylabel('Running time [s]','Fontsize',20);
+xlim([5 17]);
+ylim([0 45]);
 
-%% Grid search
+%% Grid search KALMAN SECTION
 close all; clc; clear variables;
 set(groot, 'defaultTextInterpreter','latex'); 
 set(groot, 'defaultLegendInterpreter','latex');
@@ -153,3 +155,24 @@ ylabel('$\delta$ [ms]','FontSize',20);
 zlabel('RMSE','FontSize',20);
 zlim([7 10]);
 
+%% Grid search RESULTS SECTION
+set(groot, 'defaultTextInterpreter','latex','defaultAxesTickLabelInterpreter','latex'); 
+set(groot, 'defaultLegendInterpreter','latex','defaultAxesTickLabelInterpreter','latex');
+
+load('Decoders_performance.mat');
+
+subplot(1,2,2);
+hold on;
+yyaxis left;
+bar([mean(avg.RMSE) mean(linear.RMSE) mean(spider_kalman.RMSE) mean(VKF.RMSE) mean(GVKF.RMSE)]);
+ylabel('RMSE','FontSize',20);
+set(gca,'FontSize',15,'yscal','log');
+ylim([5 30]);
+yyaxis right;
+bar([mean(avg.t) mean(linear.t)  mean(spider_kalman.t) mean(VKF.t) mean(GVKF.t)]);
+set(gca,'FontSize',15);
+xticks([1:6]);
+xtickangle(45);
+xticklabels({'Average','Linear','GKF','VKF','GVKF'});
+ylabel('Run time [s]','FontSize',20);
+ylim([0 20]);
